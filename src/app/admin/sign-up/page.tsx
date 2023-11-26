@@ -11,7 +11,7 @@ export default function signUp() {
         <select
           id="position"
           name="position"
-          className="pl-3 w-40 text-center mb-3 self-center border border-black"
+          className="pl-3 w-40 text-center mb-3 self-center border border-black rounded-lg h-10 dark:text-black"
           required
         >
           <option value="admin">Admin</option>
@@ -20,32 +20,36 @@ export default function signUp() {
         </select>
         <input
           type="text"
+          name="fname"
           placeholder="First Name"
-          className="pl-2 border border-black"
+          className="pl-2 border border-black rounded-lg h-10 dark:text-black"
           required
         />
         <input
           type="text"
+          name="lname"
           placeholder="Last Name"
-          className="pl-2 border border-black"
+          className="pl-2 border border-black rounded-lg h-10 dark:text-black"
           required
         />
         <input
           type="text"
+          name="email"
           placeholder="Email"
-          className="pl-2 border border-black"
+          className="pl-2 border border-black rounded-lg h-10 dark:text-black"
           required
         />
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          className="pl-2 border border-black"
+          className="pl-2 border border-black rounded-lg h-10 dark:text-black"
           required
         />
         <Button
           variant={"default"}
           type="submit"
-          className="w-40 self-center bg-green-800 mt-4"
+          className="w-40 self-center bg-green-800 mt-4 dark:text-white"
         >
           Submit
         </Button>
