@@ -11,10 +11,10 @@ interface User {
 }
 
 const pool = new Pool({
-  user: "your_pg_user",
-  host: "localhost",
-  database: "your_db_name",
-  password: "your_db_password",
+  user: "default",
+  host: " ep-black-math-09864837.ap-southeast-1.postgres.vercel-storage.com",
+  database: "verceldb",
+  password: "jMKU1Nxr9BsL",
   port: 5432,
 });
 
