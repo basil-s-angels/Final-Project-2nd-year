@@ -65,7 +65,9 @@ export default function Form() {
 
   return (
     <main>
-      <h1 className="ml-10 mt-4 mb-4 text-lg font-bold">Sign Up as an Admin</h1>
+      <h1 className="ml-10 mt-4 mb-4 text-lg font-bold">
+        Sign Up as an Admin.
+      </h1>
       <form
         className="flex flex-col gap-2 mx-auto max-w-md"
         onSubmit={handleSubmit}
