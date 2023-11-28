@@ -9,6 +9,7 @@ interface User {
   email: string;
   password: string;
 }
+// hello this is a tese
 
 const pool = new Pool({
   user: "default",
