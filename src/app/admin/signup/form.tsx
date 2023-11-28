@@ -1,10 +1,37 @@
-import { Button } from "@/components/ui/button";
+"use client";
 
-export default function signUp() {
+import { Button } from "@/components/ui/button";
+import { FormEvent } from "react";
+import { useRouter } from "next/navigation";
+
+export default function Form() {
+  const router = useRouter();
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({
+        position: formData.get("position"),
+        fname: formData.get("fname"),
+        lname: formData.get("lname"),
+        email: formData.get("email"),
+        password: formData.get("password"),
+      }),
+    });
+
+    router.push("/admin/login");
+    console.log({ response });
+  };
+
   return (
     <main className="h-[100vh]">
       <h1 className="ml-10 mt-4 mb-4 text-lg font-bold">Sign Up as an Admin</h1>
-      <form className="flex flex-col gap-2 mx-auto max-w-md">
+      <form
+        className="flex flex-col gap-2 mx-auto max-w-md"
+        onSubmit={handleSubmit}
+      >
         <label htmlFor="position" className="-mt-3 text-center">
           Select user position:
         </label>
@@ -16,7 +43,7 @@ export default function signUp() {
         >
           <option value="admin">Admin</option>
           <option value="cook">Cook</option>
-          <option value="waiter">Waiter</option>
+          <option value="service">Service</option>
         </select>
         <input
           type="text"

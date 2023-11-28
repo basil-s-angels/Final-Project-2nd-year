@@ -163,7 +163,9 @@ export default function Home() {
             </CardContent>
             <CardFooter className="flex justify-between">
               <Button variant="default">Cancel</Button>
-              <Button onClick={() => router.push("/sign-up")}>Deploy</Button>
+              <Button onClick={() => router.push("/admin/sign-up")}>
+                Deploy
+              </Button>
             </CardFooter>
           </Card>
         </div>
