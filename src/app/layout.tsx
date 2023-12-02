@@ -22,18 +22,20 @@ export default async function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
-        {session && (
-          <div>
-            CURRENTLY LOGGED IN <br />
-            <LogOut />
-          </div>
-        )}
-        {!session && (
-          <div>
-            YOU ARE LOGGED OUT <br />
-            <Link href={"/admin/login"}>LOGIN HERE</Link>
-          </div>
-        )}
+        <nav>
+          {session && (
+            <div>
+              CURRENTLY LOGGED IN <br />
+              <LogOut />
+            </div>
+          )}
+          {!session && (
+            <div>
+              YOU ARE LOGGED OUT <br />
+              <Link href={"/login"}>LOGIN HERE</Link>
+            </div>
+          )}
+        </nav>
         {children}
       </body>
     </html>
