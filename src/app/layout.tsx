@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { getServerSession } from "next-auth";
 import Link from "next/link";
 import "./globals.css";
 import LogOut from "./logout";
@@ -17,27 +16,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession();
-
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>
-        <nav>
-          {session && (
-            <div>
-              CURRENTLY LOGGED IN <br />
-              <LogOut />
-            </div>
-          )}
-          {!session && (
-            <div>
-              YOU ARE LOGGED OUT <br />
-              <Link href={"/login"}>LOGIN HERE</Link>
-            </div>
-          )}
-        </nav>
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
