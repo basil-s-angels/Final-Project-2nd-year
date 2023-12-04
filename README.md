@@ -1,6 +1,6 @@
 ## Getting Started
 
-First, run the frontend by:
+Run the frontend:
 
 ```bash
 cd ./client
@@ -17,3 +17,14 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+
+Run the backend:
+
+```bash
+cd ./server
+```
+then run:
+```bash
+idk yet
+```
