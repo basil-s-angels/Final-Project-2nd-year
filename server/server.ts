@@ -1,12 +1,25 @@
 import express from "express";
+import bcrypt from 'bcrypt';
+import bodyParser from 'body-parser';
+import jwt from 'jsonwebtoken';
+import { Pool } from 'pg';
+import 'dotenv/config';
 
-const app = express();
-const port = 3000
+async function serverStart() {
+  const app = express();
+  const port = 8080;
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+  const pool = new Pool({
+    connectionString: `postgres://postgres:${process.env.POSTGRES_PASSWORD}@127.0.0.1:5432/finalproj`
+  });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-});
+  app.get('/', async (req, res) => {
+    res.send(`Hello world!`);
+  });
+
+  app.listen(port, () => {
+    console.log(`Listening on http://localhost:${port}`);
+  });
+}
+
+serverStart();
