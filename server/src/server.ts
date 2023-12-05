@@ -10,7 +10,7 @@ async function serverStart() {
   const port = 8080;
 
   const pool = new Pool({
-    connectionString: `postgres://postgres:${process.env.POSTGRES_PASSWORD}@127.0.0.1:5432/finalproj`
+    connectionString: process.env.DATABASE_URL
   });
 
   app.get('/', async (req, res) => {
