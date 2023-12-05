@@ -26,5 +26,5 @@ cd ./server
 ```
 then run:
 ```bash
-idk yet
+npm run dev
 ```
