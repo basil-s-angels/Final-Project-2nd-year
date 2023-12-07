@@ -1,13 +1,14 @@
 "use client"
 import React from 'react';
+import Image from 'next/image';
 
 const FoodMenuPage = () => {
   const foodItems = [
-    { name: 'Margherita Pizza', description: 'Classic cheese and tomato base', price: '$8.99' },
-    { name: 'Caesar Salad', description: 'Romaine lettuce with Caesar dressing', price: '$5.99' },
-    { name: 'Spaghetti Carbonara', description: 'Pasta with creamy bacon sauce', price: '$10.99' },
-    { name: 'Grilled Salmon', description: 'Fresh salmon with a lemon butter glaze', price: '$15.99' },
-    { name: 'Chocolate Lava Cake', description: 'Warm cake with a gooey chocolate center', price: '$6.99' },
+    { name: 'Margherita Pizza', description: 'Classic cheese and tomato base', price: '$8.99', imageUrl: '' },
+    { name: 'Caesar Salad', description: 'Romaine lettuce with Caesar dressing', price: '$5.99', imageUrl: '' },
+    { name: 'Spaghetti Carbonara', description: 'Pasta with creamy bacon sauce', price: '$10.99', imageUrl: '' },
+    { name: 'Grilled Salmon', description: 'Fresh salmon with a lemon butter glaze', price: '$15.99', imageUrl: '' },
+    { name: 'Chocolate Lava Cake', description: 'Warm cake with a gooey chocolate center', price: '$6.99', imageUrl: '' },
   ];
 
   const handleAddToBasket = (itemName: string) => {
@@ -34,6 +35,9 @@ const FoodMenuPage = () => {
             flexDirection: 'column',
             justifyContent: 'space-between',
           }}>
+            <div style={{ width: '100%', height: '150px', position: 'relative' }}>
+              <Image src={item.imageUrl} alt={item.name} layout='fill' objectFit='cover' />
+            </div>
             <h2>{item.name}</h2>
             <p>{item.description}</p>
             <p style={{ fontWeight: 'bold', color: 'white' }}>{item.price}</p>
