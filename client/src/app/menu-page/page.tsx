@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const FoodMenuPage = () => {
   const foodItems = [
-    { name: 'Margherita Pizza', description: 'Classic cheese and tomato base', price: '$8.99', imageUrl: '' },
+    { name: 'Margherita Pizza', description: 'Classic cheese and tomato base', price: '$8.99', imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8fA%3D%3D' },
     { name: 'Caesar Salad', description: 'Romaine lettuce with Caesar dressing', price: '$5.99', imageUrl: '' },
     { name: 'Spaghetti Carbonara', description: 'Pasta with creamy bacon sauce', price: '$10.99', imageUrl: '' },
     { name: 'Grilled Salmon', description: 'Fresh salmon with a lemon butter glaze', price: '$15.99', imageUrl: '' },
@@ -17,34 +17,20 @@ const FoodMenuPage = () => {
   };
 
   return (
-    <div style={{ width: '80%', margin: 'auto', textAlign: 'center' }}>
+    <div className='w-[80%] m-auto text-center'>
       <h1>Our Menu</h1>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-        gap: '10px',
-        padding: '10px',
-      }}>
+      <div className='grid grid-cols-3 gap-[10px] p-[10px]'>
         {foodItems.map((item, index) => (
-          <div key={index} style={{
-            border: '1px solid #ccc',
-            padding: '16px',
-            textAlign: 'left',
-            height: '300px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}>
-            <div style={{ width: '100%', height: '150px', position: 'relative' }}>
-              <Image src={item.imageUrl} alt={item.name} layout='fill' objectFit='cover' />
+          <div key={index} className='border-[1px] border-[#ccc] text-left h-[300px] flex flex-col justify-between p-2'>
+            <div className='w-full h-[150px] relative'>
+              <img src={item.imageUrl} alt={item.name} className='mx-auto object-cover h-full w-full'/>
             </div>
             <h2>{item.name}</h2>
             <p>{item.description}</p>
-            <p style={{ fontWeight: 'bold', color: 'white' }}>{item.price}</p>
-            <button onClick={() => handleAddToBasket(item.name)} style={{
-              backgroundColor: 'green', color: 'white', padding: '10px 20px',
-              border: 'none', borderRadius: '5px', cursor: 'pointer'
-            }}>Add to Basket</button>
+            <p className='font-bold text-white'>{item.price}</p>
+            <button onClick={() => handleAddToBasket(item.name)} className='bg-green-700 py-[10px] px-[20px] rounded-[5px] cursor-pointer'>
+              Add to Basket
+            </button>
           </div>
         ))}
       </div>
