@@ -28,3 +28,5 @@ then run:
 ```bash
 npm run dev
 ```
+
+Open [http://localhost:8080](http://localhost:8080) to open backend localhost.

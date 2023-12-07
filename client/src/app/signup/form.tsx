@@ -5,24 +5,22 @@ import { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Form() {
-  const router = useRouter();
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const response = await fetch("/api/auth/signup", {
+    const response = await fetch("http://localhost:8080/signup", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         position: formData.get("position"),
-        fname: formData.get("fname"),
-        lname: formData.get("lname"),
+        first_name: formData.get("fname"),
+        last_name: formData.get("lname"),
         email: formData.get("email"),
         password: formData.get("password"),
       }),
     });
-
-    router.push("/admin/login");
-    console.log({ response });
   };
 
   return (
