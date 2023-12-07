@@ -50,14 +50,13 @@ async function serverStart() {
         email,
         position,
         hashed_password
-      ]
+      ];
 
       const { rows } = await pool.query(query, values);
       response.json({ message: "Successfully added!" });
       console.log(request.body);
     } catch (error) {
-      console.log("Error logging in...");
-      // If an error occurs, send an error message in the response
+      console.log("Having trouble signing in...");
       if (error instanceof Error) {
         response.status(401).json({ message: error.message });
       } else {
