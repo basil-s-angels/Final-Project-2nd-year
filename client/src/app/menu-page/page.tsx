@@ -44,7 +44,7 @@ const FoodMenuPage: React.FC = () => {
     console.log(`${itemName} added to basket with quantity: ${quantity}`);
   };
 
-  // Group food items by type
+  // Group food items by types
   const groupedFoodItems: Record<string, FoodItem[]> = foodItems.reduce((result: any, item) => {
     if (!result[item.type]) {
       result[item.type] = [];
