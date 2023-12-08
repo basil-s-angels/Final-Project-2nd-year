@@ -37,7 +37,7 @@
     "typescript": "^5.3.2"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "eslint --fix",
-    "*.{js,jsx,ts,tsx,css,md}": "prettier --write"
+    "**/*.{js,jsx,ts,tsx}": "eslint --fix",
+    "**/*.{js,jsx,ts,tsx,css,md}": "prettier --write"
   }
 }
