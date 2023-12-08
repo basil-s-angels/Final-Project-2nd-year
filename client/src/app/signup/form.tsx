@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 export default function Form() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

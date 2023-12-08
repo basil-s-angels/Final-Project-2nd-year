@@ -1,10 +1,12 @@
-import express, { response } from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import bcrypt from 'bcrypt';
 import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
 import { Pool } from 'pg';
 import 'dotenv/config';
+
+import { User } from "./types";
 
 async function serverStart() {
   const app = express();
@@ -23,7 +25,7 @@ async function serverStart() {
     res.send(`Hello world!`);
   });
 
-  app.post('/signup', async (request, response) => {
+  app.post('/signup', async (request: Request, response: Response) => {
     try {
       const {
         position,
@@ -52,7 +54,7 @@ async function serverStart() {
         hashed_password
       ];
 
-      const { rows } = await pool.query(query, values);
+      const { rows } = await pool.query<User>(query, values);
       response.json({ message: "Successfully added!" });
       console.log(request.body);
     } catch (error) {
@@ -65,11 +67,11 @@ async function serverStart() {
     }
   });
 
-  app.post("/login", async (request, response) => {
+  app.post("/login", async (request: Request, response: Response) => {
     try {
       const { email, password } = request.body;
 
-      const { rows } = await pool.query(
+      const { rows } = await pool.query<User>(
         "SELECT * FROM users WHERE email = $1",
         [email]
       );
@@ -95,7 +97,7 @@ async function serverStart() {
         throw new Error("Email or password is incorrect");
       }
     } catch (error) {
-      // If an error occurs, send an error message in the response
+      console.log("Having trouble logging in...");
       if (error instanceof Error) {
         response.status(401).json({ message: error.message });
       } else {
