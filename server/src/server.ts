@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import bcrypt from 'bcrypt';
-import bodyParser from 'body-parser';
-import jwt from 'jsonwebtoken';
-import { Pool } from 'pg';
-import 'dotenv/config';
+import bcrypt from "bcrypt";
+import bodyParser from "body-parser";
+import jwt from "jsonwebtoken";
+import { Pool } from "pg";
+import "dotenv/config";
 
 import { User } from "./types";
 
@@ -13,27 +13,21 @@ async function serverStart() {
   const port = 8080;
 
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL
+    connectionString: process.env.DATABASE_URL,
   });
 
   app
     .use(cors())
     .use(bodyParser.json())
-    .use(bodyParser.urlencoded({ extended: true }))
+    .use(bodyParser.urlencoded({ extended: true }));
 
-  app.get('/', async (req, res) => {
+  app.get("/", async (req, res) => {
     res.send(`Hello world!`);
   });
 
-  app.post('/signup', async (request: Request, response: Response) => {
+  app.post("/signup", async (request: Request, response: Response) => {
     try {
-      const {
-        position,
-        first_name,
-        last_name,
-        email,
-        password
-      } = request.body;
+      const { position, first_name, last_name, email, password } = request.body;
       const hashed_password = await bcrypt.hash(password, 10);
 
       const query = `
@@ -46,15 +40,9 @@ async function serverStart() {
         VALUES ($1, $2, $3, $4, $5)
       `;
 
-      const values = [
-        first_name,
-        last_name,
-        email,
-        position,
-        hashed_password
-      ];
+      const values = [first_name, last_name, email, position, hashed_password];
 
-      const { rows } = await pool.query<User>(query, values);
+      await pool.query<User>(query, values);
       response.json({ message: "Successfully added!" });
       console.log(request.body);
     } catch (error) {
@@ -73,14 +61,17 @@ async function serverStart() {
 
       const { rows } = await pool.query<User>(
         "SELECT * FROM users WHERE email = $1",
-        [email]
+        [email],
       );
 
       if (rows.length === 0) {
         throw new Error("No email found.");
       }
 
-      const correctPassword = await bcrypt.compare(password, rows[0].hashed_password);
+      const correctPassword = await bcrypt.compare(
+        password,
+        rows[0].hashed_password,
+      );
 
       if (correctPassword) {
         const token = jwt.sign(
@@ -90,10 +81,10 @@ async function serverStart() {
             expiresIn: "1h",
           },
         );
-        console.log(token, "successfully logged in")
-        return response.json({ token })
+        console.log(token, "successfully logged in");
+        return response.json({ token });
       } else {
-        console.log('Wrong password');
+        console.log("Wrong password");
         throw new Error("Email or password is incorrect");
       }
     } catch (error) {
@@ -112,4 +103,3 @@ async function serverStart() {
 }
 
 serverStart();
-
