@@ -6,7 +6,7 @@ interface Employee {
     name: string;
     position: string;
     email: string;
-    imageUrl: string;
+
 }
 
 interface Order {
@@ -20,10 +20,10 @@ interface Order {
 const employees: Employee = {
 
     id: 1,
-    name: 'basil',
-    position: 'cook',
-    email: 'basil@amso@gmail.com',
-    imageUrl: '',
+    name: 'thell',
+    position: 'waiter',
+    email: 'sssssssss',
+
 };
 
 // Example order data
@@ -61,20 +61,36 @@ const EmployeeDashboard: React.FC = () => {
 
     const [isOpen, setIsOpen] = useState(false);
     return (
-        <div className="min-h-screen bg-gray-100 p-8">
+        <div className="min-h-screen p-8 ">
+
+
             <div className="container mx-auto">
-                <h1 className="text-4xl font-bold text-center text-black mb-8">Employee Dashboard</h1> {/* Title */}
+                <h1 className="text-4xl font-bold text-center text-white mb-8">Employee Dashboard</h1> {/* Title */}
 
                 <div className="flex-1">
-                    <div className="grid text-black grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-12">
+                    <div className="mb-4 grid text-white grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-12">
                         {/* Placeholder for employee data */}
                         <div className="bg-white p-4 rounded shadow">
-                            <p className="text-lg font-semibold text-black">Name: basillll</p>
+                            <p className="text-lg font-semibold text-black">Name: thell</p>
                             <p className="text-lg text-black">ID: 696969</p>
                             {/* Other employee details */}
                         </div>
                         {/* Repeat the above div for each employee */}
                     </div>
+                </div>
+                <div className="flex justify-between mb-8 p-6 bg-gradient-to-r from-green-300 via-green-500 to-green-700 rounded-lg shadow-lg">
+                    <button
+                        className="px-10 py-2 bg-transparent text-white rounded hover:bg-green-800 duration-300 ease-in-out transform hover:-translate-y-1 mr-4" // Added right margin to the first button
+                    // Replace with your function to show tables like onclick so on
+                    >
+                        Tables
+                    </button>
+                    <button
+                        className="px-10 py-2 bg-transparent text-white rounded hover:bg-green-800 duration-300 ease-in-out transform hover:-translate-y-1"
+                    // Replace with your function to show orders like onclick so on
+                    >
+                        Orders
+                    </button>
                 </div>
 
                 <div className="fixed top-0.5 left-2 w-full"> {/* Fixed positioning at the top left corner of the screen */}
@@ -84,9 +100,9 @@ const EmployeeDashboard: React.FC = () => {
                                 className="h-12 w-12 flex flex-col justify-center items-center group mr-4"
                                 onClick={() => setIsOpen(!isOpen)}
                             >
-                                <div className={`h-1 w-6 my-1 bg-black rounded transition duration-300 ease-in-out ${isOpen ? 'transform rotate-45 translate-y-2.5' : ''}`} />
-                                <div className={`h-1 w-6 my-1 bg-black rounded transition duration-300 ease-in-out ${isOpen ? 'opacity-0' : ''}`} />
-                                <div className={`h-1 w-6 my-1 bg-black rounded transition duration-300 ease-in-out ${isOpen ? 'transform -rotate-45 -translate-y-2.5' : ''}`} />
+                                <div className={`h-1 w-6 my-1 bg-white rounded transition duration-300 ease-in-out ${isOpen ? 'transform rotate-45 translate-y-2.5' : ''}`} />
+                                <div className={`h-1 w-6 my-1 bg-white rounded transition duration-300 ease-in-out ${isOpen ? 'opacity-0' : ''}`} />
+                                <div className={`h-1 w-6 my-1 bg-white rounded transition duration-300 ease-in-out ${isOpen ? 'transform -rotate-45 -translate-y-2.5' : ''}`} />
                             </button>
                         </div>
                         {isOpen && (
@@ -118,9 +134,9 @@ const EmployeeDashboard: React.FC = () => {
             </div>
 
 
-            <div className="flex flex-wrap md:flex-nowrap gap-8 mb-8">
+            <div className="flex flex-wrap md:flex-nowrap gap-6 mb-8">
                 <div className="flex-1">
-                    <h2 className="text-2xl font-semibold mb-6 text-black">Done Orders</h2>
+                    <h2 className="text-2xl font-semibold mb-6 text-white">Done Orders</h2>
                     <div className="overflow-x-auto">
                         <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
                             <thead className="bg-gray-200 text-gray-600">
@@ -143,23 +159,6 @@ const EmployeeDashboard: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <div className="flex justify-between mb-8 p-6 bg-gradient-to-r from-green-300 via-green-500 to-green-700 rounded-lg shadow-lg">
-                <button
-                    className="px-10 py-2 bg-transparent text-white rounded hover:bg-green-800 duration-300 ease-in-out transform hover:-translate-y-1 mr-4" // Added right margin to the first button
-                // Replace with your function to show tables like onclick so on
-                >
-                    Tables
-                </button>
-                <button
-                    className="px-10 py-2 bg-transparent text-white rounded hover:bg-green-800 duration-300 ease-in-out transform hover:-translate-y-1"
-                // Replace with your function to show orders like onclick so on
-                >
-                    Orders
-                </button>
-            </div>
-
-
-
 
 
         </div>
