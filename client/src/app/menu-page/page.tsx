@@ -21,23 +21,30 @@ const FoodMenuPage: React.FC = () => {
 
   const [quantities, setQuantities] = useState<Array<number>>(Array(foodItems.length).fill(1));
 
-  const addQuantity = (index: number) => {
+  const addQuantity = (itemName: string) => {
     setQuantities((prevQuantities) => {
-      const newQuantities = [...prevQuantities];
-      newQuantities[index] += 1;
-      return newQuantities;
+      const itemIndex = foodItems.findIndex((item) => item.name === itemName);
+      if (itemIndex !== -1) {
+        const newQuantities = [...prevQuantities];
+        newQuantities[itemIndex] += 1;
+        return newQuantities;
+      }
+      return prevQuantities;
     });
   };
-
-  const minusQuantity = (index: number) => {
-    if (quantities[index] > 1) {
-      setQuantities((prevQuantities) => {
+  
+  const minusQuantity = (itemName: string) => {
+    setQuantities((prevQuantities) => {
+      const itemIndex = foodItems.findIndex((item) => item.name === itemName);
+      if (itemIndex !== -1 && prevQuantities[itemIndex] > 1) {
         const newQuantities = [...prevQuantities];
-        newQuantities[index] -= 1;
+        newQuantities[itemIndex] -= 1;
         return newQuantities;
-      });
-    }
+      }
+      return prevQuantities;
+    });
   };
+  
 
   const handleAddToBasket = (itemName: string, quantity: number) => {
     // Implement the logic to add the item to the basket
@@ -61,8 +68,8 @@ const FoodMenuPage: React.FC = () => {
           <h2 className='text-2xl font-semibold capitalize text-slate-300'>{category}</h2>
           <hr className='m-3'></hr>
           <div className='grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 gap-[10px] p-[10px] mb-3'>
-            {items.map((item, index) => (
-              <div key={index} className='border-[1px] border-[#ccc] rounded-lg text-left h-[340px] flex flex-col justify-between p-2'>
+            {items.map((item) => (
+              <div key={item.name} className='border-[1px] border-[#ccc] rounded-lg text-left h-[340px] flex flex-col justify-between p-2'>
                 <div className='w-full h-[150px] relative'>
                   <img src={item.imageUrl} alt={item.name} className='mx-auto object-cover h-full w-full'/>
                 </div>
@@ -73,13 +80,13 @@ const FoodMenuPage: React.FC = () => {
                     <div className='grid grid-cols-2 space-x-2'>
                       <p>Quantity</p>
                       <div className='grid grid-cols-3 bg-slate-200 text-black rounded-sm'>
-                        <button onClick={() => minusQuantity(index)}>-</button>
-                        <p className='text-center'>{quantities[index]}</p>
-                        <button onClick={() => addQuantity(index)}>+</button>
+                        <button onClick={() => minusQuantity(item.name)}>-</button>
+                        <p className='text-center'>{quantities[foodItems.findIndex((i) => i.name === item.name)]}</p>
+                        <button onClick={() => addQuantity(item.name)}>+</button>
                       </div>
                     </div>
                   </div>
-                <button onClick={() => handleAddToBasket(item.name, quantities[index])} className='bg-green-700 py-[10px] px-[20px] rounded-[5px] cursor-pointer font-medium'>
+                <button onClick={() => handleAddToBasket(item.name, quantities[foodItems.findIndex((i) => i.name === item.name)])} className='bg-green-700 py-[10px] px-[20px] rounded-[5px] cursor-pointer font-medium'>
                   Add to Basket
                 </button>
               </div>
