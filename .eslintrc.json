@@ -1,0 +1,16 @@
+{
+  "extends": ["eslint:recommended","next/core-web-vitals"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ]
+}

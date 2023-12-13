@@ -1,0 +1,27 @@
+{
+  "name": "final-project-2nd-year",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.23.3",
+    "eslint": "^8.55.0",
+    "eslint-config-next": "^14.0.4",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.0"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": "eslint --fix",
+    "**/*.{js,jsx,ts,tsx,css,md}": "prettier --write"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2"
+  }
+}
