@@ -77,7 +77,7 @@ const Ordercart: React.FC = () => {
                                                     <button className="md:border rounded-md md:py-2 md:px-4 md:ml-2 text-gray-700" onClick={() => addQuantity(index)}>+</button>
                                                 </div>
                                             </td>
-                                            <td className="md:text-xl text-sm text-gray-800 py-4">{(item.price * quantities[index]).toFixed(2)}</td>
+                                            <td className="md:text-xl text-sm text-gray-800 py-4">{(item.price * quantities[index]).toFixed()}</td>
                                         </tr>
                                         ))}
                                     </tbody>
