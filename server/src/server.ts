@@ -2,11 +2,13 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import { Pool } from "pg";
 import "dotenv/config";
 
 import { User } from "./types";
+// import verifyToken from "./verifyToken";
 
 async function serverStart() {
   const app = express();
@@ -19,7 +21,8 @@ async function serverStart() {
   app
     .use(cors())
     .use(bodyParser.json())
-    .use(bodyParser.urlencoded({ extended: true }));
+    .use(bodyParser.urlencoded({ extended: true }))
+    .use(cookieParser());
 
   app.get("/", async (req, res) => {
     res.send(`Hello world!`);
@@ -76,13 +79,15 @@ async function serverStart() {
       if (correctPassword) {
         const token = jwt.sign(
           { userId: rows[0].id, email: rows[0].email },
-          "secret", // Replace with a more secure secret
+          process.env.ACCESS_TOKEN_SECRET as string,
           {
             expiresIn: "1h",
           },
         );
-        console.log(token, "successfully logged in");
-        return response.json({ token });
+
+        response.cookie("token", token, { httpOnly: true });
+        // console.log(token, "successfully logged in");
+        return response.json({ token, success: true });
       } else {
         console.log("Wrong password");
         throw new Error("Email or password is incorrect");
@@ -96,6 +101,10 @@ async function serverStart() {
       }
     }
   });
+
+  // app.get("/admin", verifyToken, (req, res) => {
+  //   res.send('wubba lubba dub dub!')
+  // })
 
   app.listen(port, () => {
     console.log(`Listening on http://localhost:${port}`);

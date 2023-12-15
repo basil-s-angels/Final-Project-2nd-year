@@ -2,21 +2,37 @@
 
 import { Button } from "@/components/ui/button";
 import { FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Form() {
+  const router = useRouter();
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const response = await fetch("http://localhost:8080/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: formData.get("email"),
-        password: formData.get("password"),
-      }),
-    })
+    try {
+      const response = await fetch("http://localhost:8080/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.get("email"),
+          password: formData.get("password"),
+        }),
+      });
+      console.log(response);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          console.log("success!", result, response);
+          router.push("/admin");
+        }
+      } else {
+        console.error("HTTP error:", response.statusText);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
 
   return (
