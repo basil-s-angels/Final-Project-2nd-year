@@ -20,6 +20,7 @@ export default function AdminHome() {
         const newData = await response.json();
         console.log("response: ", response);
         console.log("newdata: ", newData);
+        router.push("/admin/employee-page");
       } else {
         if (response.status === 401) {
           router.push("/admin/login");
@@ -34,8 +35,7 @@ export default function AdminHome() {
 
   return (
     <main>
-      <h1>ADMIN PAGE YOU MUST BE LOGGGED IN TO ACCESS THIS TEST.</h1>
-      <p>yes</p>
+      <h1>Checking if logged in...</h1>
     </main>
   );
 }
