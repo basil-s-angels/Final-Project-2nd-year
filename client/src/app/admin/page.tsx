@@ -22,7 +22,7 @@ export default function AdminHome() {
         console.log("newdata: ", newData);
       } else {
         if (response.status === 401) {
-          router.push("/");
+          router.push("/admin/login");
         } else {
           console.error(response.status);
         }

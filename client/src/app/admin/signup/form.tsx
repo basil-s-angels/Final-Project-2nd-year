@@ -28,7 +28,7 @@ export default function Form() {
         const result = await response.json();
         if (result.success) {
           console.log("success!", result, response);
-          router.push("/login");
+          router.push("/admin/login");
         }
       }
     } catch (error) {

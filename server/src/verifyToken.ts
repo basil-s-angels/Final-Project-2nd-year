@@ -14,6 +14,6 @@ export default function verifyToken(
     next();
   } catch (error) {
     response.clearCookie("token");
-    return response.status(401).send("Unauthorized");
+    return response.sendStatus(401);
   }
 }
