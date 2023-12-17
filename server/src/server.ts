@@ -8,7 +8,7 @@ import { Pool } from "pg";
 import "dotenv/config";
 
 import { User } from "./types";
-// import verifyToken from "./verifyToken";
+import verifyToken from "./verifyToken";
 
 async function serverStart() {
   const app = express();
@@ -19,10 +19,16 @@ async function serverStart() {
   });
 
   app
-    .use(cors())
+    .use(cookieParser())
+    .use(
+      cors({
+        credentials: true,
+        origin: "http://localhost:3000",
+        optionsSuccessStatus: 200,
+      }),
+    )
     .use(bodyParser.json())
-    .use(bodyParser.urlencoded({ extended: true }))
-    .use(cookieParser());
+    .use(bodyParser.urlencoded({ extended: true }));
 
   app.get("/", async (req, res) => {
     res.send(`Hello world!`);
@@ -78,15 +84,18 @@ async function serverStart() {
 
       if (correctPassword) {
         const token = jwt.sign(
-          { userId: rows[0].id, email: rows[0].email },
-          process.env.ACCESS_TOKEN_SECRET as string,
           {
-            expiresIn: "1h",
+            userId: rows[0].id,
+            email: rows[0].email,
+            firstName: rows[0].first_name,
+            lastName: rows[0].last_name,
+            position: rows[0].position,
           },
+          process.env.ACCESS_TOKEN_SECRET as string,
+          { expiresIn: "5s" },
         );
 
-        response.cookie("token", token, { httpOnly: true });
-        // console.log(token, "successfully logged in");
+        response.cookie("token", token, { httpOnly: true, sameSite: "none" });
         return response.json({ token, success: true });
       } else {
         console.log("Wrong password");
@@ -102,9 +111,9 @@ async function serverStart() {
     }
   });
 
-  // app.get("/admin", verifyToken, (req, res) => {
-  //   res.send('wubba lubba dub dub!')
-  // })
+  app.get("/admin", verifyToken, (req, res) => {
+    res.json({ message: "test" });
+  });
 
   app.listen(port, () => {
     console.log(`Listening on http://localhost:${port}`);

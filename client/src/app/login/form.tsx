@@ -12,6 +12,7 @@ export default function Form() {
     try {
       const response = await fetch("http://localhost:8080/login", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -20,11 +21,11 @@ export default function Form() {
           password: formData.get("password"),
         }),
       });
-      console.log(response);
+
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
-          console.log("success!", result, response);
+          console.log("success!", result);
           router.push("/admin");
         }
       } else {
