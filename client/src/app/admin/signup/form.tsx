@@ -10,19 +10,22 @@ export default function Form() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     try {
-      const response = await fetch("http://localhost:8080/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/signup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            position: formData.get("position"),
+            first_name: formData.get("fname"),
+            last_name: formData.get("lname"),
+            email: formData.get("email"),
+            password: formData.get("password"),
+          }),
         },
-        body: JSON.stringify({
-          position: formData.get("position"),
-          first_name: formData.get("fname"),
-          last_name: formData.get("lname"),
-          email: formData.get("email"),
-          password: formData.get("password"),
-        }),
-      });
+      );
 
       if (response.ok) {
         const result = await response.json();
