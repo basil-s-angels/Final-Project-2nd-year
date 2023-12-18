@@ -1,6 +1,6 @@
 "use client";
 // EmployeeDashboard.jsx
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // Interface definitions
 
@@ -73,7 +73,36 @@ const orders: Order[] = [
 ];
 
 export default function EmployeeDashboard() {
-  const [isOpen, setIsOpen] = useState(false);
+  let [isOpen, setIsOpen] = useState(false);
+  let [name, setName] = useState("");
+  let [position, setPosition] = useState("");
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/user`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          setName(result.user.firstName + " " + result.user.lastName);
+          setPosition(result.user.position);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   const calculateTotalAmount: () => number = () => {
     const totalAmount = orders.reduce((sum, order) => sum + order.amount, 0);
@@ -94,10 +123,8 @@ export default function EmployeeDashboard() {
         <div className="flex-1">
           <div className="mb-4 grid text-white grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4 md:gap-12">
             <div className="bg-white p-4 rounded shadow">
-              <p className="text-lg font-semibold text-black">
-                Name: {employees.name}
-              </p>
-              <p className="text-lg text-black">ID: {employees.id}</p>
+              <p className="text-lg font-semibold text-black">Name: {name}</p>
+              <p className="text-lg text-black">Position: {position}</p>
             </div>
           </div>
         </div>

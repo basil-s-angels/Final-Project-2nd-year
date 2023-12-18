@@ -8,7 +8,10 @@ import { Pool } from "pg";
 import "dotenv/config";
 
 import { User } from "./types";
-import verifyToken from "./verifyToken";
+
+export interface RequestUser extends Request {
+  user: string;
+}
 
 async function serverStart() {
   const app = express();
@@ -23,7 +26,7 @@ async function serverStart() {
     .use(
       cors({
         credentials: true,
-        origin: "http://localhost:3000",
+        origin: process.env.CLIENT_URL,
         optionsSuccessStatus: 200,
       }),
     )
@@ -111,8 +114,16 @@ async function serverStart() {
     }
   });
 
-  app.get("/admin", verifyToken, (req, res) => {
-    res.json({ message: "test" });
+  app.get("/user", (request: Request, response: Response) => {
+    const token = request.cookies.token;
+    try {
+      const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string);
+      console.log(user);
+      return response.json({ user });
+    } catch (error) {
+      response.clearCookie("token");
+      return response.sendStatus(401);
+    }
   });
 
   app.listen(port, () => {
