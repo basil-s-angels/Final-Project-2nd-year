@@ -114,6 +114,21 @@ async function serverStart() {
   app.get("/admin", verifyToken, (req, res) => {
     res.json({ message: "test" });
   });
+  app.get("/employee", async (request: Request, response: Response) => {
+    const { quantity } = request.body;
+    const { rows } = await pool.query(
+      `
+    SELECT line_items.quantity, tables.id, foods.name, foods.price, invoices.created_at
+    FROM line_items
+    INNER JOIN tables ON tables.id = line_items.table_id
+    INNER JOIN foods ON foods.id = line_items.food_id
+    INNER JOIN invoices ON invoices.id = line_items.invoice_id
+    WHERE line_items.quantity = $1
+    `,
+      [quantity],
+    );
+    response.json(rows);
+  });
 
   app.listen(port, () => {
     console.log(`Listening on http://localhost:${port}`);
