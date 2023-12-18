@@ -2,11 +2,13 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import { Pool } from "pg";
 import "dotenv/config";
 
 import { User } from "./types";
+import verifyToken from "./verifyToken";
 
 async function serverStart() {
   const app = express();
@@ -17,7 +19,14 @@ async function serverStart() {
   });
 
   app
-    .use(cors())
+    .use(cookieParser())
+    .use(
+      cors({
+        credentials: true,
+        origin: "http://localhost:3000",
+        optionsSuccessStatus: 200,
+      }),
+    )
     .use(bodyParser.json())
     .use(bodyParser.urlencoded({ extended: true }));
 
@@ -75,14 +84,19 @@ async function serverStart() {
 
       if (correctPassword) {
         const token = jwt.sign(
-          { userId: rows[0].id, email: rows[0].email },
-          "secret", // Replace with a more secure secret
           {
-            expiresIn: "1h",
+            userId: rows[0].id,
+            email: rows[0].email,
+            firstName: rows[0].first_name,
+            lastName: rows[0].last_name,
+            position: rows[0].position,
           },
+          process.env.ACCESS_TOKEN_SECRET as string,
+          { expiresIn: "1h" },
         );
-        console.log(token, "successfully logged in");
-        return response.json({ token });
+
+        response.cookie("token", token, { httpOnly: true, sameSite: "none" });
+        return response.json({ token, success: true });
       } else {
         console.log("Wrong password");
         throw new Error("Email or password is incorrect");
@@ -95,6 +109,10 @@ async function serverStart() {
         response.status(500).json({ message: "An unexpected error occurred" });
       }
     }
+  });
+
+  app.get("/admin", verifyToken, (req, res) => {
+    res.json({ message: "test" });
   });
 
   app.listen(port, () => {
