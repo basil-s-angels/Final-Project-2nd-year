@@ -122,6 +122,11 @@ async function serverStart() {
     }
   });
 
+  app.delete("/user", (request: Request, response: Response) => {
+    response.clearCookie("token");
+    return response.json({ message: "Token deleted" });
+  });
+
   app.listen(port, () => {
     console.log(`Listening on http://localhost:${port}`);
   });

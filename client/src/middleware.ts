@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   const cookie = request.cookies.get("token");
 
   if (cookie) {
-    console.log(cookie);
+    console.log("cookie gotten from middleware: ", cookie);
     return NextResponse.next();
   } else {
     return NextResponse.rewrite(new URL("/admin/login", request.url));
