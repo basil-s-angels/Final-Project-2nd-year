@@ -2,6 +2,9 @@
 // EmployeeDashboard.jsx
 import React, { useEffect, useState } from "react";
 
+import { UserJWT } from "@/lib/types";
+import fetchUser from "@/lib/getUser";
+
 // Interface definitions
 
 interface Employee {
@@ -74,34 +77,12 @@ const orders: Order[] = [
 
 export default function EmployeeDashboard() {
   let [isOpen, setIsOpen] = useState(false);
-  let [name, setName] = useState("");
-  let [position, setPosition] = useState("");
+  let [user, setUser] = useState<UserJWT | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/user`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-
-        if (response.ok) {
-          const result = await response.json();
-          setName(result.user.firstName + " " + result.user.lastName);
-          setPosition(result.user.position);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    fetchData();
+    fetchUser()
+      .then((user) => setUser(user))
+      .catch((error) => console.error(error));
   }, []);
 
   const calculateTotalAmount: () => number = () => {
@@ -123,8 +104,12 @@ export default function EmployeeDashboard() {
         <div className="flex-1">
           <div className="mb-4 grid text-white grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4 md:gap-12">
             <div className="bg-white p-4 rounded shadow">
-              <p className="text-lg font-semibold text-black">Name: {name}</p>
-              <p className="text-lg text-black">Position: {position}</p>
+              <p className="text-lg font-semibold text-black">
+                Name: {user && user.firstName + " " + user.lastName}
+              </p>
+              <p className="text-lg text-black">
+                Position: {user && user.position}
+              </p>
             </div>
           </div>
         </div>

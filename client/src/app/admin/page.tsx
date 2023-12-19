@@ -2,40 +2,22 @@
 
 import React, { useEffect, useState } from "react";
 
+import { UserJWT } from "@/lib/types";
+import fetchUser from "@/lib/getUser";
+
 export default function AdminHome() {
-  let [name, setName] = useState("");
+  let [user, setUser] = useState<UserJWT | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/user`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-
-        if (response.ok) {
-          const result = await response.json();
-          setName(result.user.firstName);
-          console.log("this is the result: ", result.user.firstName);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    fetchData();
+    fetchUser()
+      .then((user) => setUser(user))
+      .catch((error) => console.error(error));
   }, []);
 
   return (
     <main>
       <h1>if you see this, that means i am logged in!!!!!</h1>
-      hello {name}!
+      hello {user && user.firstName}!
     </main>
   );
 }

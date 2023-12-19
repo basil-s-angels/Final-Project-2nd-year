@@ -9,10 +9,6 @@ import "dotenv/config";
 
 import { User } from "./types";
 
-export interface RequestUser extends Request {
-  user: string;
-}
-
 async function serverStart() {
   const app = express();
   const port = 8080;
