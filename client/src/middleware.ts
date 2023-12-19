@@ -3,13 +3,31 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  const cookie = request.cookies.get("token");
+  const signedIn = request.cookies.get("token");
+  const { pathname } = new URL(request.url);
 
-  if (cookie) {
-    console.log("cookie gotten from middleware: ", cookie);
+  console.log("cookie gotten from middleware: ", signedIn);
+  console.log("pathname gotten from middleware: ", pathname);
+  console.log("req url gotten from middleware: ", new URL(request.url));
+
+  if (signedIn) {
+    if (pathname === "/admin/login" || pathname === "/admin/signup") {
+      return NextResponse.redirect(
+        `${process.env.NEXT_PUBLIC_CLIENT_URL}/admin`,
+      );
+    }
     return NextResponse.next();
   } else {
-    return NextResponse.rewrite(new URL("/admin/login", request.url));
+    if (
+      pathname.startsWith("/admin") &&
+      pathname !== "/admin/login" &&
+      pathname !== "/admin/signup"
+    ) {
+      return NextResponse.redirect(
+        `${process.env.NEXT_PUBLIC_CLIENT_URL}/admin/login`,
+      );
+    }
+    return NextResponse.next();
   }
 }
 

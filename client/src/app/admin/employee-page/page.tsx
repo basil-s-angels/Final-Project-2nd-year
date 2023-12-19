@@ -1,6 +1,7 @@
 "use client";
 // EmployeeDashboard.jsx
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { UserJWT } from "@/lib/types";
 import fetchUser from "@/lib/getUser";
@@ -78,11 +79,17 @@ const orders: Order[] = [
 export default function EmployeeDashboard() {
   let [isOpen, setIsOpen] = useState(false);
   let [user, setUser] = useState<UserJWT | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     fetchUser()
-      .then((user) => setUser(user))
-      .catch((error) => console.error(error));
+      .then((user) => {
+        if (user === undefined) router.push("/admin/login");
+        else setUser(user);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, []);
 
   const calculateTotalAmount: () => number = () => {

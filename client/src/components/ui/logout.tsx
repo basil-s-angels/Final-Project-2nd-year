@@ -24,7 +24,7 @@ export default function Logout() {
       if (response.ok) {
         const result = await response.json();
         console.log(result.message);
-        router.refresh();
+        router.push("/admin/login");
       }
     } catch (error) {
       console.error(error);

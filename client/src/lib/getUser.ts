@@ -17,3 +17,6 @@ export default async function fetchUser() {
     console.error(error);
   }
 }
+
+// Returns
+// Object { userId: 5, email: "chadandrada20@gmail.com", firstName: "Chad Denard", lastName: "Andrada", position: "admin", iat: 1703000093, exp: 1703003693 }
