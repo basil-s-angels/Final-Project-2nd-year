@@ -92,7 +92,6 @@ async function serverStart() {
             position: rows[0].position,
           },
           process.env.ACCESS_TOKEN_SECRET as string,
-          { expiresIn: "10s" },
         );
 
         response.cookie("token", token, { httpOnly: true, sameSite: "none" });
