@@ -11,7 +11,8 @@ import { User } from "./types";
 
 async function serverStart() {
   const app = express();
-  const port = 8080;
+  const host = process.env.SERVER_HOST;
+  const port = process.env.SERVER_PORT;
 
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -91,7 +92,7 @@ async function serverStart() {
             position: rows[0].position,
           },
           process.env.ACCESS_TOKEN_SECRET as string,
-          { expiresIn: "5s" },
+          { expiresIn: "10s" },
         );
 
         response.cookie("token", token, { httpOnly: true, sameSite: "none" });
@@ -107,6 +108,21 @@ async function serverStart() {
       } else {
         response.status(500).json({ message: "An unexpected error occurred" });
       }
+    }
+  });
+
+  app.post("/user-middleware", (request: Request, response: Response) => {
+    const { token } = request.body;
+    console.log(token["value"], "from frontend");
+    try {
+      const user = jwt.verify(
+        token["value"],
+        process.env.ACCESS_TOKEN_SECRET as string,
+      );
+      return response.json({ user });
+    } catch (error) {
+      response.clearCookie("token");
+      return response.sendStatus(401);
     }
   });
 
@@ -128,7 +144,7 @@ async function serverStart() {
   });
 
   app.listen(port, () => {
-    console.log(`Listening on http://localhost:${port}`);
+    console.log(`Listening on http://${host}:${port}`);
   });
 }
 

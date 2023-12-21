@@ -3,20 +3,32 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  const signedIn = request.cookies.get("token");
-  const { pathname } = new URL(request.url);
+  const pathname = request.nextUrl.pathname;
 
-  console.log("cookie gotten from middleware: ", signedIn);
-  console.log("pathname gotten from middleware: ", pathname);
-  console.log("req url gotten from middleware: ", new URL(request.url));
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/user-middleware`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: request.cookies.get("token"),
+      }),
+    },
+  );
 
-  if (signedIn) {
+  if (response.ok) {
+    const user = await response.json();
+    console.log(user, "gotten from middleware");
     if (pathname === "/admin/login" || pathname === "/admin/signup") {
       return NextResponse.redirect(
         `${process.env.NEXT_PUBLIC_CLIENT_URL}/admin`,
       );
+    } else {
+      return NextResponse.next();
     }
-    return NextResponse.next();
   } else {
     if (
       pathname.startsWith("/admin") &&
@@ -30,7 +42,3 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 }
-
-export const config = {
-  matcher: "/admin/:path*",
-};
