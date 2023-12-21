@@ -10,6 +10,7 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/eslint-parser": "^7.23.3",
+    "dbmate": "^2.9.0",
     "eslint": "^8.55.0",
     "eslint-config-next": "^14.0.4",
     "husky": "^8.0.3",
