@@ -112,7 +112,7 @@ async function serverStart() {
 
   app.post("/user-middleware", (request: Request, response: Response) => {
     const { token } = request.body;
-    console.log(token["value"], "from frontend");
+    // console.log(token["value"], "from frontend");
 
     jwt.verify(
       token["value"],
@@ -122,7 +122,7 @@ async function serverStart() {
           response.clearCookie("token");
           return response.sendStatus(401);
         } else {
-          console.log(decoded, "from backend!");
+          // console.log(decoded, "from backend!");
           return response.json({ decoded });
         }
       },
@@ -140,7 +140,7 @@ async function serverStart() {
           response.clearCookie("token");
           return response.sendStatus(401);
         } else {
-          console.log(decoded);
+          // console.log(decoded);
           return response.json({ decoded });
         }
       },
@@ -150,6 +150,28 @@ async function serverStart() {
   app.delete("/user", (request: Request, response: Response) => {
     response.clearCookie("token");
     return response.json({ message: "Token deleted" });
+  });
+
+  app.get("/invoices", async (request: Request, response: Response) => {
+    const result = await pool.query(`
+        SELECT
+          invoices.*,
+          foods.name,
+          line_items.quantity,
+          foods.price,
+          tables.code
+        FROM line_items
+        INNER JOIN invoices
+        ON line_items.invoice_id = invoices.id
+        INNER JOIN foods
+        ON line_items.food_id = foods.id
+        INNER JOIN tables
+        ON invoices.table_id = tables.id
+        WHERE invoices.status != 'completed'
+      `);
+
+    console.log("inner join result:", result.rows);
+    return response.json(result.rows);
   });
 
   app.listen(port, () => {

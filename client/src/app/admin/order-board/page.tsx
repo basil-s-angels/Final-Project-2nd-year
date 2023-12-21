@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,42 +22,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-const lineItems = [
-  {
-    num: 1,
-    foodName: "Ceasar Salad",
-    quantity: 3,
-    price: 300,
-  },
-  {
-    num: 2,
-    foodName: "Borgir",
-    quantity: 32,
-    price: 230,
-  },
-  {
-    num: 3,
-    foodName: "Fried Chikn",
-    quantity: 1,
-    price: 60,
-  },
-  {
-    num: 4,
-    foodName: "Deluxe beef",
-    quantity: 2,
-    price: 500,
-  },
-  {
-    num: 5,
-    foodName: "Pizza",
-    quantity: 1,
-    price: 549,
-  },
-];
+import { LineItem } from "@/lib/types";
 
 export default function OrderBoard() {
   const [position, setPosition] = useState("Waiting for payment");
+  const [lineItems, setLineItems] = useState<LineItem[]>([]);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/invoices`)
+      .then((response) => response.json())
+      .then((results) => {
+        setLineItems(results);
+      });
+  }, []);
+  console.log(lineItems, "from usestate");
+
+  const tableNumber: number = Number(lineItems[0]?.code.slice(0, -6));
+
   return (
     <main>
       <nav className="border border-white text-center">Order Board</nav>
@@ -67,10 +48,10 @@ export default function OrderBoard() {
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>Created at: </p>
-            <p>Table number: </p>
-            <p>Invoice number: </p>
-            <p>Comment: </p>
+            <p>Created at: {lineItems[0]?.created_at}</p>
+            <p>Table number: {tableNumber}</p>
+            <p>Invoice number: {lineItems[0]?.id}</p>
+            <p>Comment: {lineItems[0]?.comment}</p>
             <br />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -102,6 +83,7 @@ export default function OrderBoard() {
               </DropdownMenuContent>
             </DropdownMenu>
             <br />
+            <br />
             <Table>
               <TableHeader>
                 <TableRow>
@@ -112,15 +94,13 @@ export default function OrderBoard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {lineItems.map((lineItems) => (
-                  <TableRow key={lineItems.num}>
-                    <TableCell className="font-medium">
-                      {lineItems.num}
-                    </TableCell>
-                    <TableCell>{lineItems.foodName}</TableCell>
-                    <TableCell>{lineItems.quantity}</TableCell>
+                {lineItems.map((lineItem, index) => (
+                  <TableRow key={index + 1}>
+                    <TableCell className="font-medium">{index + 1}</TableCell>
+                    <TableCell>{lineItem.name}</TableCell>
+                    <TableCell>{lineItem.quantity}</TableCell>
                     <TableCell className="text-right">
-                      {lineItems.price}
+                      {lineItem.price}
                     </TableCell>
                   </TableRow>
                 ))}
