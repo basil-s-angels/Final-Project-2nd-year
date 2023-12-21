@@ -3,7 +3,7 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
+import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import { Pool } from "pg";
 import "dotenv/config";
 
@@ -114,28 +114,38 @@ async function serverStart() {
   app.post("/user-middleware", (request: Request, response: Response) => {
     const { token } = request.body;
     console.log(token["value"], "from frontend");
-    try {
-      const user = jwt.verify(
-        token["value"],
-        process.env.ACCESS_TOKEN_SECRET as string,
-      );
-      return response.json({ user });
-    } catch (error) {
-      response.clearCookie("token");
-      return response.sendStatus(401);
-    }
+
+    jwt.verify(
+      token["value"],
+      process.env.ACCESS_TOKEN_SECRET as string,
+      (err: JsonWebTokenError | null, decoded: any) => {
+        if (err) {
+          response.clearCookie("token");
+          return response.sendStatus(401);
+        } else {
+          console.log(decoded, "from backend!");
+          return response.json({ decoded });
+        }
+      },
+    );
   });
 
   app.get("/user", (request: Request, response: Response) => {
     const token = request.cookies.token;
-    try {
-      const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string);
-      console.log(user);
-      return response.json({ user });
-    } catch (error) {
-      response.clearCookie("token");
-      return response.sendStatus(401);
-    }
+
+    jwt.verify(
+      token,
+      process.env.ACCESS_TOKEN_SECRET as string,
+      (err: JsonWebTokenError | null, decoded: any) => {
+        if (err) {
+          response.clearCookie("token");
+          return response.sendStatus(401);
+        } else {
+          console.log(decoded);
+          return response.json({ decoded });
+        }
+      },
+    );
   });
 
   app.delete("/user", (request: Request, response: Response) => {

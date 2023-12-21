@@ -28,7 +28,7 @@ export default function Form() {
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
-          console.log("success!", result);
+          console.log("success! from login form", result);
           router.push("/admin");
         }
       } else {
