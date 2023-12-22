@@ -94,7 +94,11 @@ async function serverStart() {
           process.env.ACCESS_TOKEN_SECRET as string,
         );
 
-        response.cookie("token", token, { httpOnly: true, sameSite: "none" });
+        response.cookie("token", token, {
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+        });
         return response.json({ token, success: true });
       } else {
         console.log("Wrong password");
