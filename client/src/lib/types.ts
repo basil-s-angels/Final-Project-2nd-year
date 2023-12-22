@@ -20,5 +20,4 @@ export interface LineItem {
 
 export interface OrderCardProps {
   lineItems: LineItem[];
-  tableNumber: number;
 }

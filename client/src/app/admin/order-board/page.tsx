@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 
 import { LineItem } from "@/lib/types";
-// import OrderCard from "@/components/ui/order-card";
+import OrderCard from "@/components/ui/order-card";
 
 export default function OrderBoard() {
   const [lineItems, setLineItems] = useState<LineItem[]>([]);
@@ -17,32 +17,32 @@ export default function OrderBoard() {
   }, []);
   console.log(lineItems, "from usestate");
 
-  // const tableNumber: number = Number(lineItems[0]?.code.slice(0, -6));
-
-  let groupedData: { [key: number]: any[] } = {};
+  let groupedData: any[] = [];
 
   lineItems.forEach((item) => {
     console.log(item, "item from foreach");
     let id = item.id;
 
-    if (!groupedData[id]) {
-      groupedData[id] = [];
+    if (!groupedData[id - 1]) {
+      groupedData[id - 1] = [];
     }
-    groupedData[id].push(item);
+    groupedData[id - 1].push(item);
   });
 
   console.log(groupedData, "this is grouped!!");
 
   return (
-    // <main>
-    //   <nav className="border border-white text-center">Order Board</nav>
-    //   <div className="border border-slate-500 h-screen">
-    //     <OrderCard
-    //       lineItems={lineItems}
-    //       tableNumber={tableNumber}
-    //     />
-    //   </div>
-    // </main>
-    <h1>hi</h1>
+    <main>
+      <nav className="border border-white text-center">Order Board</nav>
+      <div className="border border-slate-500 h-screen">
+        {groupedData.map(
+          (lineItems: any[], index: React.Key | null | undefined) => (
+            <div key={index}>
+              <OrderCard lineItems={lineItems} />
+            </div>
+          ),
+        )}
+      </div>
+    </main>
   );
 }

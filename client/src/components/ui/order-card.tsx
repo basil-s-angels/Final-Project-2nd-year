@@ -22,44 +22,42 @@ import {
 import { useState } from "react";
 import { OrderCardProps } from "@/lib/types";
 
-export default function OrderCard({ lineItems, tableNumber }: OrderCardProps) {
-  const [position, setPosition] = useState("Waiting for payment");
-
+export default function OrderCard({ lineItems }: OrderCardProps) {
+  const [, setPosition] = useState("");
   return (
     <Card>
       <CardHeader className="flex-row">
-        <CardTitle>Order Summary</CardTitle>
+        <CardTitle>Invoice numbr {lineItems[0]?.id}</CardTitle>
       </CardHeader>
       <CardContent>
+        <p>Table number: {lineItems[0]?.code.slice(0, -6)}</p>
         <p>Created at: {lineItems[0]?.created_at}</p>
-        <p>Table number: {tableNumber}</p>
-        <p>Invoice number: {lineItems[0]?.id}</p>
         <p>Comment: {lineItems[0]?.comment}</p>
         <br />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">{position}</Button>
+            <Button variant="destructive">{lineItems[0]?.status}</Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuLabel>Select Status</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup
-              value={position}
+              value={lineItems[0]?.status}
               onValueChange={setPosition}
             >
-              <DropdownMenuRadioItem value="Waiting for payment">
+              <DropdownMenuRadioItem value="waiting for payment">
                 Waiting for payment
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="Pending">
+              <DropdownMenuRadioItem value="pending">
                 Pending
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="Preparing">
+              <DropdownMenuRadioItem value="preparing">
                 Preparing
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="Serving">
+              <DropdownMenuRadioItem value="serving">
                 Serving
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="Completed">
+              <DropdownMenuRadioItem value="completed">
                 Completed
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
@@ -89,7 +87,12 @@ export default function OrderCard({ lineItems, tableNumber }: OrderCardProps) {
           <TableFooter>
             <TableRow>
               <TableCell colSpan={3}>Total</TableCell>
-              <TableCell className="text-right">idk math </TableCell>
+              <TableCell className="text-right">
+                {lineItems.reduce(
+                  (total, item) => total + Number(item.price) * item.quantity,
+                  0,
+                )}
+              </TableCell>
             </TableRow>
           </TableFooter>
         </Table>
