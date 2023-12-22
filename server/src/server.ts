@@ -3,16 +3,16 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
+import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import { Pool } from "pg";
 import "dotenv/config";
 
 import { User } from "./types";
-import verifyToken from "./verifyToken";
 
 async function serverStart() {
   const app = express();
-  const port = 8080;
+  const host = process.env.SERVER_HOST;
+  const port = process.env.SERVER_PORT;
 
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -23,7 +23,7 @@ async function serverStart() {
     .use(
       cors({
         credentials: true,
-        origin: "http://localhost:3000",
+        origin: process.env.CLIENT_URL,
         optionsSuccessStatus: 200,
       }),
     )
@@ -92,7 +92,6 @@ async function serverStart() {
             position: rows[0].position,
           },
           process.env.ACCESS_TOKEN_SECRET as string,
-          { expiresIn: "1h" },
         );
 
         response.cookie("token", token, { httpOnly: true, sameSite: "none" });
@@ -111,12 +110,50 @@ async function serverStart() {
     }
   });
 
-  app.get("/admin", verifyToken, (req, res) => {
-    res.json({ message: "test" });
+  app.post("/user-middleware", (request: Request, response: Response) => {
+    const { token } = request.body;
+    console.log(token["value"], "from frontend");
+
+    jwt.verify(
+      token["value"],
+      process.env.ACCESS_TOKEN_SECRET as string,
+      (err: JsonWebTokenError | null, decoded: any) => {
+        if (err) {
+          response.clearCookie("token");
+          return response.sendStatus(401);
+        } else {
+          console.log(decoded, "from backend!");
+          return response.json({ decoded });
+        }
+      },
+    );
+  });
+
+  app.get("/user", (request: Request, response: Response) => {
+    const token = request.cookies.token;
+
+    jwt.verify(
+      token,
+      process.env.ACCESS_TOKEN_SECRET as string,
+      (err: JsonWebTokenError | null, decoded: any) => {
+        if (err) {
+          response.clearCookie("token");
+          return response.sendStatus(401);
+        } else {
+          console.log(decoded);
+          return response.json({ decoded });
+        }
+      },
+    );
+  });
+
+  app.delete("/user", (request: Request, response: Response) => {
+    response.clearCookie("token");
+    return response.json({ message: "Token deleted" });
   });
 
   app.listen(port, () => {
-    console.log(`Listening on http://localhost:${port}`);
+    console.log(`Listening on http://${host}:${port}`);
   });
 }
 

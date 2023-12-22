@@ -6,3 +6,11 @@ export interface User {
   email: string;
   hashed_password: string;
 }
+
+export interface UserJWT {
+  userId: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  position: string;
+}

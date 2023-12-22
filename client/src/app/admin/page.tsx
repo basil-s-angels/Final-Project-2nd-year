@@ -1,41 +1,29 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+
+import { UserJWT } from "@/lib/types";
+import fetchUser from "@/lib/getUser";
+import Logout from "@/components/ui/logout";
 
 export default function AdminHome() {
-  const router = useRouter();
+  let [user, setUser] = useState<UserJWT | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("http://localhost:8080/admin", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    fetchUser()
+      .then((user) => {
+        setUser(user);
+      })
+      .catch((error) => {
+        console.error(error);
       });
-
-      if (response.ok) {
-        const newData = await response.json();
-        console.log("response: ", response);
-        console.log("newdata: ", newData);
-        router.push("/admin/employee-page");
-      } else {
-        if (response.status === 401) {
-          router.push("/admin/login");
-        } else {
-          console.error(response.status);
-        }
-      }
-    };
-
-    fetchData();
   }, []);
 
   return (
     <main>
-      <h1>Checking if logged in...</h1>
+      <h1>if you see this, that means i am logged in!!!!!</h1>
+      hello {user && user.firstName}!<br />
+      <Logout />
     </main>
   );
 }
