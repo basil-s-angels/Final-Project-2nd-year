@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,15 +20,45 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { OrderCardProps } from "@/lib/types";
+import { useRouter } from "next/navigation";
 
 export default function OrderCard({ lineItems }: OrderCardProps) {
-  const [, setPosition] = useState("");
+  const [position, setPosition] = useState("");
+  const router = useRouter();
+
+  async function handleStatusChange(newStatus: SetStateAction<string>) {
+    setPosition(newStatus);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/updateStatus`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          invoices: lineItems[0]?.id,
+        }),
+      },
+    );
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log(result.message, result.status);
+      // if (result.status === 'completed') {
+      //   router.refresh();
+      // }
+    } else {
+      console.error("HTTP error:", response.statusText);
+    }
+  }
+
   return (
     <Card>
       <CardHeader className="flex-row">
-        <CardTitle>Invoice numbr {lineItems[0]?.id}</CardTitle>
+        <CardTitle>Invoice number {lineItems[0]?.id}</CardTitle>
       </CardHeader>
       <CardContent>
         <p>Table number: {lineItems[0]?.code.slice(0, -6)}</p>
@@ -36,14 +67,16 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
         <br />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="destructive">{lineItems[0]?.status}</Button>
+            <Button variant="destructive">
+              {position || lineItems[0]?.status}
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuLabel>Select Status</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup
-              value={lineItems[0]?.status}
-              onValueChange={setPosition}
+              value={position || lineItems[0]?.status}
+              onValueChange={handleStatusChange}
             >
               <DropdownMenuRadioItem value="waiting for payment">
                 Waiting for payment

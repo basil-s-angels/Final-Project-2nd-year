@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import express, { Request, Response } from "express";
 import cors from "cors";
 import bcrypt from "bcrypt";
@@ -176,6 +177,22 @@ async function serverStart() {
 
     console.log("inner join result:", result.rows);
     return response.json(result.rows);
+  });
+
+  app.patch("/updateStatus", async (request: Request, response: Response) => {
+    const { status, invoices } = request.body;
+
+    const result = await pool.query(
+      `
+        UPDATE invoices
+        SET status = $1
+        FROM line_items
+        WHERE invoices.id = line_items.invoice_id AND line_items.invoice_id = $2;
+      `,
+      [status, invoices],
+    );
+
+    return response.json({ message: "hi hello", status });
   });
 
   app.listen(port, () => {
