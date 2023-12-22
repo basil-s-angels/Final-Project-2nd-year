@@ -1,4 +1,6 @@
+/* eslint-disable no-unused-vars */
 "use client";
+
 import { useState, useEffect } from "react";
 
 interface Invoice {
@@ -34,7 +36,6 @@ export default function EmployeeDashboard() {
         console.log(data);
       });
   }, []);
-  console.log(invoices, "from usestate");
 
   return (
     <div className="min-h-screen p-4 md:p-8 bg-gray-900 text-white">
@@ -91,52 +92,63 @@ export default function EmployeeDashboard() {
                 Yearly
               </button>
             </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-gray-700 rounded-lg shadow overflow-hidden">
-                <thead className="bg-gray-600 text-gray-200">
-                  <tr>
-                    <th className="py-2 px-4 md:py-3 md:px-6 text-left">
-                      Invoice No.
-                    </th>
-                    <th className="py-2 px-4 md:py-3 md:px-6 text-center">
-                      Order Date
-                    </th>
-                    <th className="py-2 px-4 md:py-3 md:px-6 text-right">
-                      Amount
-                    </th>
-                  </tr>
-                  {invoices.map((invoice, index) => (
-                    <tr key={index}>
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-left">
-                        {invoice?.invoice_id}
-                      </td>
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-center">
-                        {invoice?.created_at}
-                      </td>
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-right">
-                        {invoice?.price}
-                      </td>
-                    </tr>
-                  ))}
-                </thead>
-
-                <tbody className="text-gray-200">
-                  {/* Render table rows based on orderData */}
-                  {orderData.map((order) => (
-                    <tr key={order.id} className="border-b hover:bg-gray-600">
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-left">
-                        Invoice {order.InvoiceNumber}
-                      </td>
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-center">
-                        {order.orderDate}
-                      </td>
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-right">
-                        P {order.amount.toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-4 md:mb-8">
+              <div className="flex-1">
+                <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">
+                  Done Orders
+                </h2>
+                {/* Filter buttons */}
+                <div className="flex mb-4">
+                  {/* ... (existing filter buttons) */}
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full bg-gray-700 rounded-lg shadow overflow-hidden">
+                    <thead className="bg-gray-600 text-gray-200">
+                      <tr>
+                        <th className="py-2 px-4 md:py-3 md:px-6 text-left">
+                          Invoice No.
+                        </th>
+                        <th className="py-2 px-4 md:py-3 md:px-6 text-center">
+                          Order Date
+                        </th>
+                        <th className="py-2 px-4 md:py-3 md:px-6 text-right">
+                          Amount
+                        </th>
+                        <th className="py-2 px-4 md:py-3 md:px-6 text-right">
+                          Total Amount
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-gray-200">
+                      {invoices.map((invoice, index) => (
+                        <tr key={index}>
+                          <td className="py-2 px-4 md:py-3 md:px-6 text-left">
+                            {invoice?.invoice_id}
+                          </td>
+                          <td className="py-2 px-4 md:py-3 md:px-6 text-center">
+                            {invoice?.created_at}
+                          </td>
+                          <td className="py-2 px-4 md:py-3 md:px-6 text-right">
+                            P{invoice?.price}
+                          </td>
+                          <td className="py-2 px-4 md:py-3 md:px-6 text-right">
+                            {/* Calculate total amount for the specific order */}
+                            {invoices
+                              .filter(
+                                (invoice) =>
+                                  invoice.invoice_id === invoice.invoice_id,
+                              )
+                              .reduce(
+                                (total, invoice) => total + invoice.price,
+                                0,
+                              )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
