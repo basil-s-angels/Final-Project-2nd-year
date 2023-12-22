@@ -17,3 +17,8 @@ export interface LineItem {
   price: string;
   code: string;
 }
+
+export interface OrderCardProps {
+  lineItems: LineItem[];
+  tableNumber: number;
+}
