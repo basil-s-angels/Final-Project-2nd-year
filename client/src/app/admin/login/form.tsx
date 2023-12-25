@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { FormEvent } from "react";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Form() {
-  // const router = useRouter();
+  const router = useRouter();
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -32,7 +32,7 @@ export default function Form() {
         console.log(token);
         if (result.success) {
           console.log("success! from login form", result);
-          // router.push("/admin");
+          router.push("/admin");
         }
       } else {
         console.error("HTTP error:", response.statusText);
