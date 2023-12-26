@@ -1,4 +1,5 @@
-import express, { Request, Response } from "express";
+/* eslint-disable no-unused-vars */
+import express, { Request, Response, request } from "express";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import bodyParser from "body-parser";
@@ -154,6 +155,18 @@ async function serverStart() {
   app.delete("/user", (request: Request, response: Response) => {
     response.clearCookie("token");
     return response.json({ message: "Token deleted" });
+  });
+
+  app.get("/menu-page", async (request: Request, response: Response) => {
+    try {
+      const result = await pool.query("SELECT * FROM foods");
+      response.json(result.rows);
+    } catch (error) {
+      console.error(error);
+      response
+        .status(500)
+        .json({ error: "An error occurred while fetching the menu items." });
+    }
   });
 
   app.listen(port, () => {

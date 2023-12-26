@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 // import { Item } from "@radix-ui/react-select";
 import React, { useState } from "react";
@@ -10,7 +11,11 @@ interface CartItem {
   imageurl: string;
 }
 
-const Ordercart: React.FC = () => {
+type OrdercartProps = {
+  orders: Array<{ itemName: string; quantity: number }>;
+};
+
+const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
   // eslint-disable-next-line no-unused-vars
   const [cartItems, setcartItems] = useState<CartItem[]>([
     {
@@ -68,6 +73,13 @@ const Ordercart: React.FC = () => {
           {" "}
           ORDER SUMMARY
         </h1>
+        <div>
+          {orders.map((order, index) => (
+            <p key={index}>
+              Item: {order.itemName}, Quantity: {order.quantity}
+            </p>
+          ))}
+        </div>
         <div className="flex flex-col md:flex-row gap-4 pt-8">
           <div className="md:w-3/4">
             <div className="bg-white rounded-lg shadow-md p-6 mb-4">
