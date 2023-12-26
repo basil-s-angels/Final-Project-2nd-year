@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   const response = await fetch(
-    `https://hedgehog-discrete-raccoon.ngrok-free.app/user-middleware`,
+    `${process.env.NEXT_PUBLIC_SERVER_URL}/user-middleware`,
     {
       method: "POST",
       credentials: "include",
@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
     console.log(user, "gotten from middleware");
     if (pathname === "/admin/login" || pathname === "/admin/signup") {
       return NextResponse.redirect(
-        `https://final-project-2nd-year.vercel.app/admin`,
+        `${process.env.NEXT_PUBLIC_CLIENT_URL}/admin`,
       );
     } else {
       return NextResponse.next();
@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
       pathname !== "/admin/signup"
     ) {
       return NextResponse.redirect(
-        `https://final-project-2nd-year.vercel.app/admin/login`,
+        `${process.env.NEXT_PUBLIC_CLIENT_URL}/admin/login`,
       );
     }
     return NextResponse.next();
