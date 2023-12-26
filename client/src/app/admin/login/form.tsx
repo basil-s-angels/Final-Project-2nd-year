@@ -24,12 +24,9 @@ export default function Form() {
           }),
         },
       );
-      console.log(process.env.NEXT_PUBLIC_SERVER_URL);
       console.log(response);
       if (response.ok) {
         const result = await response.json();
-        const token = result.token;
-        console.log(token);
         if (result.success) {
           console.log("success! from login form", result);
           router.push("/admin");
