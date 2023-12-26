@@ -1,66 +1,59 @@
+/* eslint-disable no-unused-vars */
 "use client";
 // import { Item } from "@radix-ui/react-select";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Client } from "pg";
 
 interface CartItem {
   id: number;
   name: string;
   price: number;
   quantity: number;
-  imageurl: string;
 }
 
 const Ordercart: React.FC = () => {
-  // eslint-disable-next-line no-unused-vars
-  const [cartItems, setcartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: "Hamburger",
-      price: 300,
-      quantity: 1,
-      imageurl:
-        "https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/M6HASPARCZHYNN4XTUYT7H6PTE.jpg",
-    },
-    {
-      id: 2,
-      name: "Italian Pizza",
-      price: 399,
-      quantity: 1,
-      imageurl:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5gNuIAb__tptA0QHpxisWbSc46w7k4phPLA&usqp=CAU",
-    },
-  ]);
+  const [cartItems, setcartItems] = useState<CartItem[]>([]);
 
-  const [quantities, setQuantities] = useState(Array(cartItems.length).fill(1));
+  // const handleAddtoCart = (items: Cartitem) =>{
+  //   setcartItems([...cartItems, items])
+  // }
 
-  const addQuantity = (index: number) => {
-    setQuantities((prevQuantities) => {
-      const newQuantities = [...prevQuantities];
-      newQuantities[index] += 1;
-      return newQuantities;
-    });
+  const handleRemoveFromCart = (id: number) => {
+    setcartItems(cartItems.filter((item) => item.id != id));
   };
 
-  const minusQuantity = (index: number) => {
-    if (quantities[index] > 1) {
-      setQuantities((prevQuantities) => {
-        const newQuantities = [...prevQuantities];
-        newQuantities[index] -= 1;
-        return newQuantities;
-      });
-    }
+  // const addQuantity = (index: number) => {
+  //   setQuantities((prevQuantities) => {
+  //     const newQuantities = [...prevQuantities];
+  //     newQuantities[index] += 1;
+  //     return newQuantities;
+  //   });
+  // };
+
+  // const minusQuantity = (index: number) => {
+  //   if (quantities[index] > 1) {
+  //     setQuantities((prevQuantities) => {
+  //       const newQuantities = [...prevQuantities];
+  //       newQuantities[index] -= 1;
+  //       return newQuantities;
+  //     });
+  //   }
+  // };
+
+  // const calculateSubtotal = () => {
+  //   return cartItems.reduce(
+  //     (total, item, index) => total + item.price * quantities[index],
+  //     0,
+  //   );
+  // };
+
+  const handleCheckout = async () => {
+    const order = cartItems.map((item) => ({
+      id: item.id,
+      quantity: item.quantity,
+    }));
   };
 
-  const calculateSubtotal = () => {
-    return cartItems.reduce(
-      (total, item, index) => total + item.price * quantities[index],
-      0,
-    );
-  };
-
-  const handleCheckout = () => {
-    alert("Thank you for choosing us!");
-  };
   return (
     <div className=" h-screen py-8">
       <div className="container mx-auto px-4">
@@ -82,7 +75,7 @@ const Ordercart: React.FC = () => {
                       {" "}
                       Price
                     </th>
-                    <th className="md:text-xl sm:text-sm text-left text-blue-600 font-semibold ml-6">
+                    <th className="md:text-xl sm:text-sm text-left text-blue-600 font-semibold pl-7">
                       {" "}
                       Quantity
                     </th>
@@ -93,15 +86,10 @@ const Ordercart: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {cartItems.map((item, index) => (
+                  {/* {cartItems.map((item, index) => (
                     <tr key={item.id}>
                       <td className="py-4">
                         <div className="flex-items-center">
-                          <img
-                            className="h-20 w-18 mr-4"
-                            src={item.imageurl}
-                            alt="Food image 1"
-                          />
                           <span className=" text-blue-800 font-semibold pl-4">
                             {" "}
                             {item.name}{" "}
@@ -124,7 +112,7 @@ const Ordercart: React.FC = () => {
                             {quantities[index]}
                           </span>
                           <button
-                            className="md:border rounded-md md:py-2 md:px-4 md:ml-2 text-gray-700"
+                            className="md:border rounded-md md:py-2 md:px-4 md:ml-2 text-gray-700 "
                             onClick={() => addQuantity(index)}
                           >
                             +
@@ -135,7 +123,7 @@ const Ordercart: React.FC = () => {
                         {(item.price * quantities[index]).toFixed()}
                       </td>
                     </tr>
-                  ))}
+                  ))} */}
                 </tbody>
               </table>
             </div>
@@ -148,9 +136,9 @@ const Ordercart: React.FC = () => {
               </h2>
               <div className="flex justify-between mb-2">
                 <span className="text-blue-600 text-xl">Subtotal</span>
-                <span className="text-gray-600">
+                {/* <span className="text-gray-600">
                   {calculateSubtotal().toFixed(2)}
-                </span>
+                </span> */}
               </div>
               <div>
                 <h2 className="text-lg text-gray-600 font-semibold mb-4">
