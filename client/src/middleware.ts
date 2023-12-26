@@ -4,8 +4,7 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  console.log(request, "request from midleware");
-  console.log(request.cookies, "request from midleware");
+
   const response = await fetch(
     `https://hedgehog-discrete-raccoon.ngrok-free.app/user-middleware`,
     {
@@ -14,9 +13,6 @@ export async function middleware(request: NextRequest) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        token: request.cookies.get("token"),
-      }),
     },
   );
 
