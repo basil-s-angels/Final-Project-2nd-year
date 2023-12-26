@@ -157,10 +157,20 @@ async function serverStart() {
   });
   app.get("/admin/employee", async (request: Request, response: Response) => {
     const result = await pool.query(
-      `SELECT invoice_id, created_at, price
-    FROM line_items
-    INNER JOIN invoices ON line_items.invoice_id = invoices.id
-    INNER JOIN foods ON line_items.food_id = foods.id
+      `SELECT 
+      invoices.*, 
+      foods.name, 
+      line_items.quantity, 
+      foods.price, 
+      tables.code
+      FROM line_items
+      INNER JOIN invoices
+      ON line_items.invoice_id = invoices.id 
+      INNER JOIN foods
+      ON line_items.food_id = foods.id
+      INNER JOIN tables
+      ON invoices.table_id = tables.id
+      WHERE invoices.status = 'completed'
     `,
     );
     return response.json(result.rows);

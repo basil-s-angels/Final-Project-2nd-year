@@ -1,12 +1,18 @@
 /* eslint-disable no-unused-vars */
 "use client";
 
+import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useState, useEffect } from "react";
 
 interface Invoice {
-  invoice_id: number;
+  quantity: number;
+  id: number;
+  name: string;
+  comment: string;
+  code: string;
   created_at: string;
   price: number;
+  status: string;
 }
 
 interface Order {
@@ -25,7 +31,13 @@ export default function EmployeeDashboard() {
   const [employeeData, setEmployeeData] = useState<EmployeeData | null>(null);
   const [orderData] = useState<Order[]>([]);
   const [timeFilter, setTimeFilter] = useState<string>("daily");
+  const [activeFilter, setActiveFilter] = useState<string>("daily");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(
+    null,
+  );
+  const [isDetailViewVisible, setIsDetailViewVisible] =
+    useState<boolean>(false);
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee`)
@@ -33,9 +45,15 @@ export default function EmployeeDashboard() {
       .then((data) => {
         setEmployeeData(data);
         setInvoices(data);
-        console.log(data);
       });
   }, []);
+
+  const totalAmountForAllOrders = () => {
+    return invoices.reduce(
+      (total, invoice) => total + invoice.price * invoice.quantity,
+      0,
+    );
+  };
 
   return (
     <div className="min-h-screen p-4 md:p-8 bg-gray-900 text-white">
@@ -51,104 +69,115 @@ export default function EmployeeDashboard() {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between mb-4 md:mb-8 p-3 md:p-6 bg-gradient-to-r from-green-300 via-green-500 to-green-700 rounded-lg shadow-lg">
-          <button className="px-4 py-2 bg-transparent rounded hover:bg-green-800 duration-300 ease-in-out transform hover:-translate-y-1 mb-2 md:mb-0">
-            Edit Menu
-          </button>
-          <button className="px-4 py-2 bg-transparent rounded hover:bg-green-800 duration-300 ease-in-out transform hover:-translate-y-1">
-            Orders
-          </button>
-        </div>
-
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-4 md:mb-8">
           <div className="flex-1">
             <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">
               Done Orders
             </h2>
+
             {/* Filter buttons */}
             <div className="flex mb-4">
               <button
                 className={`px-4 py-2 rounded mr-2 ${
-                  timeFilter === "daily" ? "bg-green-500" : "bg-gray-500"
+                  activeFilter === "daily" ? "bg-green-500" : "bg-gray-500"
                 }`}
-                onClick={() => setTimeFilter("daily")}
+                onClick={() => {
+                  setTimeFilter("daily");
+                  setActiveFilter("daily");
+                }}
               >
                 Daily
               </button>
               <button
                 className={`px-4 py-2 rounded mr-2 ${
-                  timeFilter === "monthly" ? "bg-green-500" : "bg-gray-500"
+                  activeFilter === "monthly" ? "bg-green-500" : "bg-gray-500"
                 }`}
-                onClick={() => setTimeFilter("monthly")}
+                onClick={() => {
+                  setTimeFilter("monthly");
+                  setActiveFilter("monthly");
+                }}
               >
                 Monthly
               </button>
               <button
                 className={`px-4 py-2 rounded ${
-                  timeFilter === "yearly" ? "bg-green-500" : "bg-gray-500"
+                  activeFilter === "yearly" ? "bg-green-500" : "bg-gray-500"
                 }`}
-                onClick={() => setTimeFilter("yearly")}
+                onClick={() => {
+                  setTimeFilter("yearly");
+                  setActiveFilter("yearly");
+                }}
               >
                 Yearly
               </button>
             </div>
-            <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-4 md:mb-8">
-              <div className="flex-1">
-                <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">
-                  Done Orders
-                </h2>
-                {/* Filter buttons */}
-                <div className="flex mb-4">
-                  {/* ... (existing filter buttons) */}
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-gray-700 rounded-lg shadow overflow-hidden">
-                    <thead className="bg-gray-600 text-gray-200">
-                      <tr>
-                        <th className="py-2 px-4 md:py-3 md:px-6 text-left">
-                          Invoice No.
-                        </th>
-                        <th className="py-2 px-4 md:py-3 md:px-6 text-center">
-                          Order Date
-                        </th>
-                        <th className="py-2 px-4 md:py-3 md:px-6 text-right">
-                          Amount
-                        </th>
-                        <th className="py-2 px-4 md:py-3 md:px-6 text-right">
-                          Total Amount
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-gray-200">
-                      {invoices.map((invoice, index) => (
-                        <tr key={index}>
-                          <td className="py-2 px-4 md:py-3 md:px-6 text-left">
-                            {invoice?.invoice_id}
+
+            {/* Display total amount */}
+            <div className="text-xl font-semibold mb-4">
+              Total Amount: P{totalAmountForAllOrders().toFixed(2)}
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-gray-700 rounded-lg shadow overflow-hidden">
+                <thead className="bg-gray-600 text-gray-200">
+                  <tr>
+                    <th className="py-2 px-4 md:py-3 md:px-6 text-left">
+                      Invoice No.
+                    </th>
+                    <th className="py-2 px-4 md:py-3 md:px-6 text-center">
+                      Order Date
+                    </th>
+                    <th className="py-2 px-4 md:py-3 md:px-6 text-right">
+                      Amount
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody className="text-gray-200">
+                  {invoices.map((invoice, index) => (
+                    <tr
+                      key={index}
+                      onClick={() => {
+                        setSelectedInvoiceId(invoice.id);
+                        setIsDetailViewVisible(!isDetailViewVisible);
+                      }}
+                    >
+                      <td className="py-2 px-4 md:py-3 md:px-6 text-left">
+                        {invoice?.id}
+                      </td>
+                      <td className="py-2 px-4 md:py-3 md:px-6 text-center">
+                        {invoice?.created_at}
+                      </td>
+                      <td className="py-2 px-4 md:py-3 md:px-6 text-right">
+                        P{(invoice?.price * invoice.quantity).toFixed(2)}
+                      </td>
+
+                      {selectedInvoiceId === invoice.id &&
+                        isDetailViewVisible && (
+                          <td colSpan={4}>
+                            <div>
+                              <p>Name: {invoice.name}</p>
+                              <p>
+                                Price: P
+                                {(invoice.price * invoice.quantity).toFixed(2)}
+                              </p>
+                              <p>Quantity: {invoice.quantity}</p>
+                              <p>Comment: {invoice.comment}</p>
+                              <p>Created At: {invoice.created_at}</p>
+                              <p>Status: {invoice.status}</p>
+                              <button
+                                className="px-4 py-2 bg-transparent rounded hover:bg-green-800"
+                                onClick={() => setIsDetailViewVisible(false)}
+                              >
+                                Back
+                              </button>
+                            </div>
                           </td>
-                          <td className="py-2 px-4 md:py-3 md:px-6 text-center">
-                            {invoice?.created_at}
-                          </td>
-                          <td className="py-2 px-4 md:py-3 md:px-6 text-right">
-                            P{invoice?.price}
-                          </td>
-                          <td className="py-2 px-4 md:py-3 md:px-6 text-right">
-                            {/* Calculate total amount for the specific order */}
-                            {invoices
-                              .filter(
-                                (invoice) =>
-                                  invoice.invoice_id === invoice.invoice_id,
-                              )
-                              .reduce(
-                                (total, invoice) => total + invoice.price,
-                                0,
-                              )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                        )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
