@@ -13,6 +13,9 @@ export async function middleware(request: NextRequest) {
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        token: request.cookies.get("token"),
+      }),
     },
   );
 
