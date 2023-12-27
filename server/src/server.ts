@@ -6,9 +6,7 @@ import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import { Pool } from "pg";
 import "dotenv/config";
-
 import { User } from "./types";
-import verifyToken from "./verifyToken";
 
 async function serverStart() {
   const app = express();
@@ -111,8 +109,24 @@ async function serverStart() {
     }
   });
 
-  app.get("/admin", verifyToken, (req, res) => {
-    res.json({ message: "test" });
+  app.get("/:tableId/status", async (request: Request, response: Response) => {
+    const { tableId } = request.params;
+    try {
+      const getDatabaseContent = pool.query(
+        `
+      SELECT invoices.status, line_items.quantity, foods.name, tables.id
+      FROM invoices INNER JOIN line_items ON 
+      invoices.id = line_items.invoice_id
+      INNER JOIN foods ON foods.id = line_items.food_id
+	    INNER JOIN tables on tables.id = invoices.table_id
+      WHERE invoices.table_id = $1`,
+        [tableId],
+      );
+      const databaseContent = (await getDatabaseContent).rows;
+      response.json({ data: databaseContent });
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   app.listen(port, () => {
