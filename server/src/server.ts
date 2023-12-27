@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import express, { Request, Response } from "express";
 import cors from "cors";
 import bcrypt from "bcrypt";
@@ -149,6 +150,46 @@ async function serverStart() {
         }
       },
     );
+  });
+
+  app.post("/order", async (request: Request, response: Response) => {
+    try {
+      const { selected, comment } = await request.body;
+      console.log(selected, "from orders");
+      console.log(comment, "from orders");
+      const res1 = await pool.query(
+        `
+      INSERT INTO invoices 
+      (created_at, status, comment, table_id)
+      VALUES 
+      (NOW(),
+      'waiting for payment',
+      $1,
+      9)
+      RETURNING id`,
+        [comment],
+      );
+      const invoiceId = res1.rows[0].id;
+      console.log(res1.rows[0], "res rows");
+      console.log(invoiceId, "res invoice id");
+
+      // // Then, insert into line_items using the newly generated id
+      const values = selected
+        .map(
+          (item: { id: any; quantity: any }) =>
+            `(${item.quantity}, ${item.id}, ${invoiceId})`,
+        )
+        .join(", ");
+
+      const query = `INSERT INTO line_items (quantity, food_id, invoice_id) VALUES ${values}`;
+      console.log(query);
+      const res2 = await pool.query(query);
+    } catch (error) {
+      console.error(error);
+      response
+        .status(500)
+        .json({ error: "An error occurred while fetching the menu items." });
+    }
   });
 
   app.delete("/user", (request: Request, response: Response) => {

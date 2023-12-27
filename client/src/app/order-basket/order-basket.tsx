@@ -11,8 +11,27 @@ interface CartItem {
   quantity: number;
 }
 
-const Ordercart: React.FC = () => {
-  const [cartItems, setcartItems] = useState<CartItem[]>([]);
+type OrdercartProps = {
+  orders: Array<{ itemName: string; quantity: number }>;
+};
+
+const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
+  const [cartItems, setcartItems] = useState<any[]>([]);
+  const [quantities, setQuantities] = useState(Array(cartItems.length).fill(1));
+  const [comment, setComment] = useState("");
+
+  useEffect(() => {
+    console.log(orders, "orders");
+    setcartItems(orders);
+  }, []);
+
+  const addQuantity = (index: number) => {
+    setQuantities((prevQuantities) => {
+      const newQuantities = [...prevQuantities];
+      newQuantities[index] += 1;
+      return newQuantities;
+    });
+  };
 
   // const handleAddtoCart = (items: Cartitem) =>{
   //   setcartItems([...cartItems, items])
@@ -22,36 +41,40 @@ const Ordercart: React.FC = () => {
     setcartItems(cartItems.filter((item) => item.id != id));
   };
 
-  // const addQuantity = (index: number) => {
-  //   setQuantities((prevQuantities) => {
-  //     const newQuantities = [...prevQuantities];
-  //     newQuantities[index] += 1;
-  //     return newQuantities;
-  //   });
-  // };
+  const minusQuantity = (index: number): undefined => {
+    if (quantities[index] > 1) {
+      setQuantities((prevQuantities) => {
+        const newQuantities = [...prevQuantities];
+        newQuantities[index] -= 1;
+        return newQuantities;
+      });
+    }
+  };
 
-  // const minusQuantity = (index: number) => {
-  //   if (quantities[index] > 1) {
-  //     setQuantities((prevQuantities) => {
-  //       const newQuantities = [...prevQuantities];
-  //       newQuantities[index] -= 1;
-  //       return newQuantities;
-  //     });
-  //   }
-  // };
-
-  // const calculateSubtotal = () => {
-  //   return cartItems.reduce(
-  //     (total, item, index) => total + item.price * quantities[index],
-  //     0,
-  //   );
-  // };
+  const calculateSubtotal = () => {
+    return cartItems.reduce(
+      (total, item, index) => total + item.price * quantities[index],
+      0,
+    );
+  };
 
   const handleCheckout = async () => {
-    const order = cartItems.map((item) => ({
-      id: item.id,
-      quantity: item.quantity,
-    }));
+    console.log(cartItems, "cartitems");
+    console.log(comment);
+    alert("Thank you for choosing us!");
+
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/order`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        selected: cartItems,
+        comment: comment,
+      }),
+    })
+      .then((response) => response.json())
+      .then((result) => console.log(result, "shshs"));
   };
 
   return (
@@ -86,7 +109,7 @@ const Ordercart: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* {cartItems.map((item, index) => (
+                  {/* {orders.map((item, index) => (
                     <tr key={item.id}>
                       <td className="py-4">
                         <div className="flex-items-center">
@@ -104,7 +127,7 @@ const Ordercart: React.FC = () => {
                         <div className="flex-items-center">
                           <button
                             className="md:border rounded-md md:py-2 md:px-4 md:mr-2 ml-2 text-gray-700 "
-                            onClick={() => minusQuantity(index)}
+                            onClick={minusQuantity(index)}
                           >
                             -
                           </button>
@@ -124,6 +147,11 @@ const Ordercart: React.FC = () => {
                       </td>
                     </tr>
                   ))} */}
+                  {orders.map((order, index) => (
+                    <p key={index} className="text-black">
+                      {order.quantity}x {order.itemName}
+                    </p>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -136,9 +164,9 @@ const Ordercart: React.FC = () => {
               </h2>
               <div className="flex justify-between mb-2">
                 <span className="text-blue-600 text-xl">Subtotal</span>
-                {/* <span className="text-gray-600">
+                <span className="text-gray-600">
                   {calculateSubtotal().toFixed(2)}
-                </span> */}
+                </span>
               </div>
               <div>
                 <h2 className="text-lg text-gray-600 font-semibold mb-4">
@@ -149,11 +177,13 @@ const Ordercart: React.FC = () => {
                   type="text"
                   className="text-gray-600 w-full h-20 px-3 border-gray-600"
                   placeholder="Insert Special Message here"
+                  value={comment}
+                  onChange={(event) => setComment(event.target.value)}
                 />
               </div>
               <button
                 className="bg-blue-500 text-white-700 py-2 px-4 rounded-lg mt-4 w-full"
-                onClick={() => handleCheckout}
+                onClick={handleCheckout}
               >
                 {" "}
                 Place Order

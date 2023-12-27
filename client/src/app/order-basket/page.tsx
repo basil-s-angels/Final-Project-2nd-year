@@ -1,13 +1,13 @@
-"use Client";
-import React from "react";
-import Ordercart from "./order-basket";
+// "use Client";
+// import React from "react";
+// import Ordercart from "./order-basket";
 
-const OrderBasketPage: React.FC = () => {
-  return (
-    <div>
-      <Ordercart />
-    </div>
-  );
-};
+// const OrderBasketPage: React.FC = () => {
+//   return (
+//     <div>
+//       <Ordercart />
+//     </div>
+//   );
+// };
 
-export default OrderBasketPage;
+// export default OrderBasketPage
