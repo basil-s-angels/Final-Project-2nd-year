@@ -20,6 +20,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { SetStateAction, useState } from "react";
 import { OrderCardProps } from "@/lib/types";
 import { useRouter } from "next/navigation";
@@ -47,9 +59,26 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
     if (response.ok) {
       const result = await response.json();
       console.log(result.message, result.status);
-      // if (result.status === 'completed') {
-      //   router.refresh();
-      // }
+    } else {
+      console.error("HTTP error:", response.statusText);
+    }
+  }
+
+  async function handleCancel(invoiceId: number) {
+    console.log("cancelled order from invoice", invoiceId);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/invoices/${invoiceId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log(result.message);
     } else {
       console.error("HTTP error:", response.statusText);
     }
@@ -58,7 +87,40 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
   return (
     <Card>
       <CardHeader className="flex-row">
-        <CardTitle>Invoice number {lineItems[0]?.id}</CardTitle>
+        <CardTitle className="flex flex-row items-center w-full">
+          <div className="basis-[90%]">Invoice number {lineItems[0]?.id}</div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="destructive"
+                className="basis-[10%] text-center text-base"
+              >
+                Cancel
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Warning!</DialogTitle>
+                <DialogDescription>
+                  Would you like to cancel this order from invoice number{" "}
+                  {lineItems[0]?.id}?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    type="submit"
+                    onClick={async () => {
+                      await handleCancel(lineItems[0]?.id);
+                    }}
+                  >
+                    Cancel Order
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <p>Table number: {lineItems[0]?.code.slice(0, -6)}</p>
@@ -67,7 +129,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
         <br />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="destructive">
+            <Button variant="outline" className="bg-slate-900">
               {position || lineItems[0]?.status}
             </Button>
           </DropdownMenuTrigger>

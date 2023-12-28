@@ -179,6 +179,21 @@ async function serverStart() {
     return response.json(result.rows);
   });
 
+  app.delete("/invoices/:id", async (request: Request, response: Response) => {
+    const result = await pool.query(
+      `
+        DELETE FROM invoices
+        WHERE id = $1
+      `,
+      [request.params.id],
+    );
+
+    console.log("test delete invoice", request.params.id);
+    return response.json({
+      message: `Invoice number ${request.params.id} deleted`,
+    });
+  });
+
   app.patch("/updateStatus", async (request: Request, response: Response) => {
     const { status, invoices } = request.body;
 
