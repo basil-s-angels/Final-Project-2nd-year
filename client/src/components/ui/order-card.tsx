@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,11 +33,9 @@ import {
 
 import { SetStateAction, useState } from "react";
 import { OrderCardProps } from "@/lib/types";
-import { useRouter } from "next/navigation";
 
 export default function OrderCard({ lineItems }: OrderCardProps) {
   const [position, setPosition] = useState("");
-  const router = useRouter();
 
   async function handleStatusChange(newStatus: SetStateAction<string>) {
     setPosition(newStatus);
