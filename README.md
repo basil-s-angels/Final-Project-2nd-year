@@ -1,9 +1,17 @@
 ## Getting Started
 
+Install all dependencies:
+
+```bash
+npm run install-all
+```
+
+This will install all dependencies in the root, client, and server directory!
+
 Run the frontend:
 
 ```bash
-cd ./client
+cd client
 ```
 
 then run:
@@ -23,7 +31,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 Run the backend:
 
 ```bash
-cd ./server
+cd server
 ```
 
 then run:

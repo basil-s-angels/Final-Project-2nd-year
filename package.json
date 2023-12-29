@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "install-all": "npm i && cd client && npm i && cd ../server && npm i"
   },
   "keywords": [],
   "author": "",
