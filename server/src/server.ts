@@ -165,7 +165,8 @@ async function serverStart() {
     FROM line_items
     INNER JOIN invoices ON line_items.invoice_id = invoices.id
     INNER JOIN foods ON line_items.food_id = foods.id
-    GROUP BY invoices.id, invoices.created_at`);
+    GROUP BY invoices.id, invoices.created_at
+    `);
 
       response.json(result.rows);
     } catch (error) {

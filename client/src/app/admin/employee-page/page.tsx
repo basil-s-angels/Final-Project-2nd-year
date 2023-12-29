@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 "use client";
-import { Item } from "@radix-ui/react-select";
+
 import { useState, useEffect } from "react";
 
 interface Invoice {
@@ -28,16 +28,12 @@ interface EmployeeData {
 
 export default function EmployeeDashboard() {
   const [employeeData, setEmployeeData] = useState<EmployeeData | null>(null);
-  const [orderData] = useState<Order[]>([]);
-  const [timeFilter, setTimeFilter] = useState<string>("daily");
-  const [activeFilter, setActiveFilter] = useState<string>("daily");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [test, setTest] = useState<any[]>([]);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(
     null,
   );
-  const [isDetailViewVisible, setIsDetailViewVisible] =
-    useState<boolean>(false);
+  const [filter, setFilter] = useState<string>("");
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee`)
@@ -82,6 +78,30 @@ export default function EmployeeDashboard() {
 
   console.log(groupedData, "this is grouped!!");
 
+  const filterInvoices = (filter: string) => {
+    const currentDate = new Date();
+    return invoices.filter((invoice) => {
+      const invoiceDate = new Date(invoice.created_at);
+      switch (filter) {
+        case "daily":
+          return (
+            invoiceDate.getDate() === currentDate.getDate() &&
+            invoiceDate.getMonth() === currentDate.getMonth() &&
+            invoiceDate.getFullYear() === currentDate.getFullYear()
+          );
+        case "monthly":
+          return (
+            invoiceDate.getMonth() === currentDate.getMonth() &&
+            invoiceDate.getFullYear() === currentDate.getFullYear()
+          );
+        case "yearly":
+          return invoiceDate.getFullYear() === currentDate.getFullYear();
+        default:
+          return true; // Show all invoices
+      }
+    });
+  };
+
   return (
     <div className="min-h-screen p-4 md:p-8 bg-gray-900 text-white">
       <div className="container mx-auto bg-gray-800 rounded-lg shadow-lg p-4 md:p-8">
@@ -102,37 +122,27 @@ export default function EmployeeDashboard() {
               Done Orders
             </h2>
             Filter Orders
-            <div className="flex mb-4">
+            <div className="flex justify-center space-x-4">
               <button
-                className={`px-4 py-2 rounded mr-2 ${
-                  activeFilter === "daily" ? "bg-green-500" : "bg-gray-500"
-                }`}
-                onClick={() => {
-                  setTimeFilter("daily");
-                  setActiveFilter("daily");
-                }}
+                className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
+                px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+                onClick={() => setFilter("daily")}
               >
                 Daily
               </button>
+
               <button
-                className={`px-4 py-2 rounded mr-2 ${
-                  activeFilter === "monthly" ? "bg-green-500" : "bg-gray-500"
-                }`}
-                onClick={() => {
-                  setTimeFilter("monthly");
-                  setActiveFilter("monthly");
-                }}
+                className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
+                px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+                onClick={() => setFilter("monthly")}
               >
                 Monthly
               </button>
+
               <button
-                className={`px-4 py-2 rounded ${
-                  activeFilter === "yearly" ? "bg-green-500" : "bg-gray-500"
-                }`}
-                onClick={() => {
-                  setTimeFilter("yearly");
-                  setActiveFilter("yearly");
-                }}
+                className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
+                px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+                onClick={() => setFilter("yearly")}
               >
                 Yearly
               </button>
@@ -156,7 +166,6 @@ export default function EmployeeDashboard() {
                     </th>
                   </tr>
                 </thead>
-
                 <tbody className="text-gray-200">
                   {groupedData.map((invoice: any[], index) => (
                     <tr
