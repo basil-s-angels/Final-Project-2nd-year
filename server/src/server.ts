@@ -163,15 +163,12 @@ async function serverStart() {
           invoices.*,
           foods.name,
           line_items.quantity,
-          foods.price,
-          tables.code
+          foods.price
         FROM line_items
         INNER JOIN invoices
         ON line_items.invoice_id = invoices.id
         INNER JOIN foods
         ON line_items.food_id = foods.id
-        INNER JOIN tables
-        ON invoices.table_id = tables.id
         WHERE invoices.status != 'completed'
       `);
 

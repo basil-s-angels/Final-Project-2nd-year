@@ -1,20 +1,22 @@
-## Getting Started
+## Install all dependencies
 
-Install all dependencies:
+This will install all the dependencies in the root, client, and server directory!
 
 ```bash
 npm run install-all
+# or
+npm run i-all
 ```
 
-This will install all dependencies in the root, client, and server directory!
+## Run the frontend
 
-Run the frontend:
+Open a new terminal and run:
 
 ```bash
 cd client
 ```
 
-then run:
+Then run:
 
 ```bash
 npm run dev
@@ -28,13 +30,15 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Run the backend:
+## Run the backend
+
+Open a new terminal and run:
 
 ```bash
 cd server
 ```
 
-then run:
+Then run:
 
 ```bash
 npm run dev
@@ -46,4 +50,4 @@ pnpm dev
 bun dev
 ```
 
-You can now fetch from [http://localhost:8080](http://localhost:8080) to perform requests and receive responses.
+You can now fetch data from [http://localhost:8080](http://localhost:8080)

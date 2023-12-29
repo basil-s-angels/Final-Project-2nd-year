@@ -120,7 +120,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p>Table number: {lineItems[0]?.code.slice(0, -6)}</p>
+        <p>Table number: {lineItems[0]?.table_num}</p>
         <p>Created at: {lineItems[0]?.created_at}</p>
         <p>Comment: {lineItems[0]?.comment}</p>
         <br />
