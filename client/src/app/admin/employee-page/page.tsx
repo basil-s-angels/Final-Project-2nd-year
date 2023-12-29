@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 "use client";
-
-import { TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { Item } from "@radix-ui/react-select";
 import { useState, useEffect } from "react";
 
 interface Invoice {
@@ -33,6 +32,7 @@ export default function EmployeeDashboard() {
   const [timeFilter, setTimeFilter] = useState<string>("daily");
   const [activeFilter, setActiveFilter] = useState<string>("daily");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [test, setTest] = useState<any[]>([]);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(
     null,
   );
@@ -43,8 +43,21 @@ export default function EmployeeDashboard() {
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee`)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data, "from useeffect");
         setEmployeeData(data);
         setInvoices(data);
+        setTest(data);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee:description`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "from useeffect");
+        setEmployeeData(data);
+        setInvoices(data);
+        setTest(data);
       });
   }, []);
 
@@ -54,6 +67,20 @@ export default function EmployeeDashboard() {
       0,
     );
   };
+
+  let groupedData: any[] = [];
+
+  test.forEach((item) => {
+    console.log(item, "item from foreach");
+    let id = item.id;
+
+    if (!groupedData[id - 1]) {
+      groupedData[id - 1] = [];
+    }
+    groupedData[id - 1].push(item);
+  });
+
+  console.log(groupedData, "this is grouped!!");
 
   return (
     <div className="min-h-screen p-4 md:p-8 bg-gray-900 text-white">
@@ -74,8 +101,7 @@ export default function EmployeeDashboard() {
             <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">
               Done Orders
             </h2>
-
-            {/* Filter buttons */}
+            Filter Orders
             <div className="flex mb-4">
               <button
                 className={`px-4 py-2 rounded mr-2 ${
@@ -111,12 +137,10 @@ export default function EmployeeDashboard() {
                 Yearly
               </button>
             </div>
-
             {/* Display total amount */}
             <div className="text-xl font-semibold mb-4">
               Total Amount: P{totalAmountForAllOrders().toFixed(2)}
             </div>
-
             <div className="overflow-x-auto">
               <table className="min-w-full bg-gray-700 rounded-lg shadow overflow-hidden">
                 <thead className="bg-gray-600 text-gray-200">
@@ -134,46 +158,74 @@ export default function EmployeeDashboard() {
                 </thead>
 
                 <tbody className="text-gray-200">
-                  {invoices.map((invoice, index) => (
+                  {groupedData.map((invoice: any[], index) => (
                     <tr
                       key={index}
                       onClick={() => {
-                        setSelectedInvoiceId(invoice.id);
-                        setIsDetailViewVisible(!isDetailViewVisible);
+                        setSelectedInvoiceId(invoice[0].id);
                       }}
                     >
                       <td className="py-2 px-4 md:py-3 md:px-6 text-left">
-                        {invoice?.id}
+                        {invoice[0]?.id}
                       </td>
                       <td className="py-2 px-4 md:py-3 md:px-6 text-center">
-                        {invoice?.created_at}
+                        {invoice[0]?.created_at}
                       </td>
                       <td className="py-2 px-4 md:py-3 md:px-6 text-right">
-                        P{(invoice?.price * invoice.quantity).toFixed(2)}
+                        P
+                        {invoice
+                          .reduce(
+                            (total, item) =>
+                              total + Number(item.price) * item.quantity,
+                            0,
+                          )
+                          .toFixed(2)}
                       </td>
-
-                      {selectedInvoiceId === invoice.id &&
-                        isDetailViewVisible && (
-                          <td colSpan={4}>
+                      {selectedInvoiceId === invoice[0].id && (
+                        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center rounded bg-gray-800 p-4 ring-2 ring-gray-200">
+                          <div className="m-auto rounded bg-gray-800 p-4 ring-2 ring-gray-200">
                             <div>
-                              <p>Name: {invoice.name}</p>
-                              <p>
-                                Price: P
-                                {(invoice.price * invoice.quantity).toFixed(2)}
-                              </p>
-                              <p>Quantity: {invoice.quantity}</p>
-                              <p>Comment: {invoice.comment}</p>
-                              <p>Created At: {invoice.created_at}</p>
-                              <p>Status: {invoice.status}</p>
-                              <button
-                                className="px-4 py-2 bg-transparent rounded hover:bg-green-800"
-                                onClick={() => setIsDetailViewVisible(false)}
-                              >
-                                Back
-                              </button>
+                              <h1>Invoice #{invoice[0].id}</h1>
+                              {invoice.map((lineItem, index) => (
+                                <div
+                                  key={index + 1}
+                                  className="rounded bg-gray-800 p-2 ring-2 ring-gray-200"
+                                >
+                                  {lineItem.quantity}x {lineItem.name}
+                                  <br />
+                                  price: {lineItem.price *
+                                    lineItem.quantity}{" "}
+                                  <br />
+                                </div>
+                              ))}
                             </div>
-                          </td>
-                        )}
+                            <br />
+                            <div className="rounded bg-gray-800 p-2 ring-2 ring-gray-200">
+                              Total: P
+                              {invoice
+                                .reduce(
+                                  (total, lineItem) =>
+                                    total + lineItem.price * lineItem.quantity,
+                                  0,
+                                )
+                                .toFixed(2)}
+                            </div>
+                            <div className="rounded bg-gray-800 p-2 ring-2 ring-gray-200">
+                              {" "}
+                              comment: {invoice[0].comment}
+                            </div>
+                            <div className="rounded bg-gray-800 p-2 ring-2 ring-gray-200">
+                              {" "}
+                              status: {invoice[0].status}
+                            </div>
+                            <button className="bg-grey-700 hover:bg-green-700 text-grey font-bold py-2 px-4 rounded ring-2 ring-gray-200">
+                              <a href="/admin/employee-page">
+                                <div>back</div>
+                              </a>
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </tr>
                   ))}
                 </tbody>

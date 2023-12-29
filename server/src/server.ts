@@ -156,8 +156,31 @@ async function serverStart() {
     return response.json({ message: "Token deleted" });
   });
   app.get("/admin/employee", async (request: Request, response: Response) => {
-    const result = await pool.query(
-      `SELECT 
+    try {
+      const result = await pool.query(`
+      SELECT 
+      invoices.id,
+      invoices.created_at,
+      SUM(foods.price) AS total_price
+    FROM line_items
+    INNER JOIN invoices ON line_items.invoice_id = invoices.id
+    INNER JOIN foods ON line_items.food_id = foods.id
+    GROUP BY invoices.id, invoices.created_at`);
+
+      response.json(result.rows);
+    } catch (error) {
+      console.error(error);
+      response
+        .status(500)
+        .json({ error: "An error occurred while fetching the menu items." });
+    }
+  });
+
+  app.get(
+    "/admin/employee:description",
+    async (request: Request, response: Response) => {
+      const result = await pool.query(
+        `SELECT 
       invoices.*, 
       foods.name, 
       line_items.quantity, 
@@ -172,9 +195,10 @@ async function serverStart() {
       ON invoices.table_id = tables.id
       WHERE invoices.status = 'completed'
     `,
-    );
-    return response.json(result.rows);
-  });
+      );
+      return response.json(result.rows);
+    },
+  );
 
   app.listen(port, () => {
     console.log(`Listening on http://${host}:${port}`);
