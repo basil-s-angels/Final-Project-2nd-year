@@ -11,7 +11,7 @@ interface FoodItem {
   type: string;
   name: string;
   details: string;
-  price: string;
+  price: number;
 }
 
 type ImageMapping = {
@@ -33,7 +33,7 @@ export default function FoodMenuPage() {
     Array(foodItems.length).fill(1),
   );
   const [orders, setOrders] = useState<
-    Array<{ id: number; itemName: string; quantity: number }>
+    Array<{ id: number; itemName: string; quantity: number; price: number }>
   >([]);
 
   useEffect(() => {
@@ -88,6 +88,7 @@ export default function FoodMenuPage() {
     id: number,
     itemName: string,
     quantity: number,
+    price: number,
   ) => {
     setOrders((prevOrders) => {
       const existingOrder = prevOrders.find(
@@ -100,7 +101,7 @@ export default function FoodMenuPage() {
             : order,
         );
       } else {
-        return [...prevOrders, { id, itemName, quantity }];
+        return [...prevOrders, { id, itemName, quantity, price }];
       }
     });
   };
@@ -158,6 +159,7 @@ export default function FoodMenuPage() {
                       quantities[
                         foodItems.findIndex((i) => i.name === item.name)
                       ],
+                      item.price,
                     )
                   }
                   className="bg-green-700 py-[10px] px-[20px] rounded-[5px] cursor-pointer font-medium"
