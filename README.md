@@ -8,6 +8,16 @@ npm run install-all
 npm run i-all
 ```
 
+## Run both frontend and backend (Using Concurrently)
+
+Open a terminal on root directory and run:
+
+```bash
+npm run dev
+```
+
+This should run the dev script on both frontend and backend simultaneously. If you prefer running both frontend and backend separately, see alternatives below.
+
 ## Run the frontend
 
 Open a new terminal and run:
