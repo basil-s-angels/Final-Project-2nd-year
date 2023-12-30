@@ -14,19 +14,36 @@ const StatusPage = ({ params }: { params: { table: string } }) => {
   const [foodOrders, setFoodOrders] = useState<FoodOrder[]>(foodArray);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/${tablenum}/status`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setFoodOrders([...data.data]);
-      });
+    setInterval(() => {
+      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/${tablenum}/status`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          setFoodOrders([...data.data]);
+        });
+    }, 5000);
   }, [tablenum]);
+  const currentStatus = foodOrders[0] ? foodOrders[0].status : "";
+
+  function changeStatusColor(status: string) {
+    if (status === "pending") {
+      return "blue";
+    } else if (status === "completed") {
+      return "green";
+    } else if (status === "serving") {
+      return "pink";
+    } else if (status === "waiting for order") {
+      return "red";
+    } else if (status === "preparing") {
+      return "violet";
+    }
+  }
 
   return (
     <div className="min-h-screen items-center justify-center bg-gray-800 text-gray-600">
@@ -49,7 +66,6 @@ const StatusPage = ({ params }: { params: { table: string } }) => {
                       }}
                     >
                       <div>
-                        {" "}
                         <p className="text-left">{foodOrder.name}</p>
                       </div>
                       <br></br>
@@ -66,9 +82,9 @@ const StatusPage = ({ params }: { params: { table: string } }) => {
               <div className="grid grid-cols-2"></div>
               <div className="p-10">
                 The status of your order:
-                <strong className="text-blue-400 text-lg">
-                  <p>{foodOrders[0] ? foodOrders[0].status : ""}</p>
-                </strong>
+                <p style={{ color: changeStatusColor(currentStatus) }}>
+                  {currentStatus}
+                </p>
                 <br></br>
               </div>
             </p>
