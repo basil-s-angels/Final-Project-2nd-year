@@ -55,7 +55,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
 
     if (response.ok) {
       const result = await response.json();
-      console.log(result.message, result.status);
+      console.log(result.status);
     } else {
       console.error("HTTP error:", response.statusText);
     }
@@ -82,15 +82,15 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
   }
 
   return (
-    <Card>
+    <Card className="bg-slate-900 w-[400px]">
       <CardHeader className="flex-row">
         <CardTitle className="flex flex-row items-center w-full">
-          <div className="basis-[90%]">Invoice number {lineItems[0]?.id}</div>
+          <div className="basis-[90%]">INVOICE #{lineItems[0]?.id}</div>
           <Dialog>
             <DialogTrigger asChild>
               <Button
                 variant="destructive"
-                className="basis-[10%] text-center text-base"
+                className="basis-[10%] text-center text-sm"
               >
                 Cancel
               </Button>
@@ -120,49 +120,55 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p>Table number: {lineItems[0]?.table_num}</p>
-        <p>Created at: {lineItems[0]?.created_at}</p>
-        <p>Comment: {lineItems[0]?.comment}</p>
+        <p className="text-sm">Table number: {lineItems[0]?.table_num}</p>
+        <p className="text-sm">Created at: {lineItems[0]?.date_format}</p>
+        <p className="text-sm">Comment: {lineItems[0]?.comment}</p>
         <br />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="bg-slate-900">
-              {position || lineItems[0]?.status}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel>Select Status</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup
-              value={position || lineItems[0]?.status}
-              onValueChange={handleStatusChange}
-            >
-              <DropdownMenuRadioItem value="waiting for payment">
-                Waiting for payment
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="pending">
-                Pending
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="preparing">
-                Preparing
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="serving">
-                Serving
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="completed">
-                Completed
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <br />
+        <div className="flex justify-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild className="">
+              <Button
+                variant="outline"
+                className="bg-slate-800 border-slate-600"
+              >
+                {position.charAt(0).toUpperCase() + position.slice(1) ||
+                  lineItems[0]?.status.charAt(0).toUpperCase() +
+                    lineItems[0]?.status.slice(1)}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Select Status</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={position || lineItems[0]?.status}
+                onValueChange={handleStatusChange}
+              >
+                <DropdownMenuRadioItem value="waiting for payment">
+                  Waiting for payment
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="pending">
+                  Pending
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="preparing">
+                  Preparing
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="serving">
+                  Serving
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="completed">
+                  Completed
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <br />
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">num</TableHead>
-              <TableHead>food name</TableHead>
-              <TableHead>quantity</TableHead>
+              <TableHead className="w-[50px]">#</TableHead>
+              <TableHead className="w-auto">food name</TableHead>
+              <TableHead className="w-[50px]">quantity</TableHead>
               <TableHead className="text-right">price</TableHead>
             </TableRow>
           </TableHeader>
@@ -171,9 +177,11 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
               <TableRow key={index + 1}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
                 <TableCell>{lineItem.name}</TableCell>
-                <TableCell>{lineItem.quantity}</TableCell>
+                <TableCell className="text-center">
+                  {lineItem.quantity}
+                </TableCell>
                 <TableCell className="text-right">
-                  {Number(lineItem.price).toFixed(2)}
+                  {"₱ " + Number(lineItem.price).toFixed(2)}
                 </TableCell>
               </TableRow>
             ))}
@@ -182,12 +190,14 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
             <TableRow>
               <TableCell colSpan={3}>Total</TableCell>
               <TableCell className="text-right">
-                {Number(
-                  lineItems.reduce(
-                    (total, item) => total + Number(item.price) * item.quantity,
-                    0,
-                  ),
-                ).toFixed(2)}
+                {"₱ " +
+                  Number(
+                    lineItems.reduce(
+                      (total, item) =>
+                        total + Number(item.price) * item.quantity,
+                      0,
+                    ),
+                  ).toFixed(2)}
               </TableCell>
             </TableRow>
           </TableFooter>

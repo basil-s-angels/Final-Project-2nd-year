@@ -15,6 +15,7 @@ export interface LineItem {
   name: string;
   quantity: number;
   price: string;
+  date_format: string;
 }
 
 export interface OrderCardProps {
