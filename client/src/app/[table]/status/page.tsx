@@ -39,25 +39,35 @@ const StatusPage = ({ params }: { params: { table: string } }) => {
 
           <div className="flex items-center justify-center">
             <p className="text-lg font-bold">
-              <div className="grid grid-cols-2">
+              <div>
                 {foodOrders.map((foodOrder) => (
                   <div key={foodOrder.id}>
-                    <p className="text-left">{foodOrder.name}</p>
-                    <br></br>
-                    <p className="text-right">Quantity: {foodOrder.quantity}</p>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div>
+                        {" "}
+                        <p className="text-left">{foodOrder.name}</p>
+                      </div>
+                      <br></br>
+                      <div>
+                        <p className="text-right">
+                          Quantity: {foodOrder.quantity}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
               <div className="border-t border-gray-300 mb-2"></div>
               <div className="grid grid-cols-2"></div>
               <div className="p-10">
-                The status of your order:{" "}
+                The status of your order:
                 <strong className="text-blue-400 text-lg">
-                  {foodOrders.map((foodOrder) => (
-                    <div key={foodOrder.id}>
-                      <p>{foodOrder.status}</p>
-                    </div>
-                  ))}{" "}
+                  <p>{foodOrders[0] ? foodOrders[0].status : ""}</p>
                 </strong>
                 <br></br>
               </div>
