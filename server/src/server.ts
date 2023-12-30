@@ -9,6 +9,7 @@ import { Pool } from "pg";
 import "dotenv/config";
 
 import { User } from "./types";
+import { request } from "http";
 
 async function serverStart() {
   const app = express();
@@ -152,6 +153,18 @@ async function serverStart() {
     );
   });
 
+  app.get("/order", async (request: Request, response: Response) => {
+    try {
+      const result = await pool.query("SELECT price FROM foods");
+      response.json(result.rows);
+    } catch (error) {
+      console.log(error);
+      response
+        .status(500)
+        .json({ error: "An error occured while fetching the base price" });
+    }
+  });
+
   app.post("/order", async (request: Request, response: Response) => {
     try {
       const { selected, comment } = await request.body;
@@ -165,7 +178,7 @@ async function serverStart() {
       (NOW(),
       'waiting for payment',
       $1,
-      9)
+      5)
       RETURNING id`,
         [comment],
       );

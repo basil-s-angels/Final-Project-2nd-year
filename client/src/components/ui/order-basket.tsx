@@ -63,6 +63,10 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
     console.log(comment);
     alert("Thank you for choosing us!");
 
+    if (comment.trim() === "") {
+      setComment("N/A");
+    }
+
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/order`, {
       method: "POST",
       headers: {
@@ -93,10 +97,6 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
                     <th className="md:text-xl sm:text-sm text-left  text-blue-600 font-semibold">
                       {" "}
                       Food Name
-                    </th>
-                    <th className="md:text-xl sm:text-sm text-left text-blue-600 font-semibold">
-                      {" "}
-                      Price
                     </th>
                     <th className="md:text-xl sm:text-sm text-left text-blue-600 font-semibold pl-7">
                       {" "}
