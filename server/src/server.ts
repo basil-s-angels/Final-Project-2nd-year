@@ -163,9 +163,33 @@ async function serverStart() {
       response.json(result.rows);
     } catch (error) {
       console.error(error);
+      response.status(500).json({ error: "Error fetching the menu items." });
+    }
+  });
+
+  app.get("/menu-page", async (request: Request, response: Response) => {
+    try {
+      const result = await pool.query(`
+        SELECT SUM(quantity) as sum, foods.name
+        from line_items
+        INNER JOIN foods
+        ON foods.id = line_items.food_id
+        INNER JOIN invoices 
+        ON invoices.id = line_items.invoice_id
+        WHERE invoices.created_at
+        BETWEEN '2023-01-01 07:00:00' AND '2023-12-31 10:00:00'
+        GROUP BY foods.name
+        ORDER BY sum DESC
+      `);
+      response.json(result.rows);
+    } catch (error) {
+      console.error(error);
       response
         .status(500)
-        .json({ error: "An error occurred while fetching the menu items." });
+        .json({
+          error:
+            "Error fetching the amount of times each menu item was ordered.",
+        });
     }
   });
 

@@ -3,9 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import Ordercart from "../order-basket/order-basket";
+import Ordercart from "../../order-basket/order-basket";
+import Image from "next/image";
 
 interface FoodItem {
+  id: number;
   type: string;
   name: string;
   details: string;
@@ -17,18 +19,12 @@ type ImageMapping = {
 };
 
 const imageMapping: ImageMapping = {
-  "Caesar Salad":
-    "https://as2.ftcdn.net/v2/jpg/02/02/48/35/1000_F_202483549_3cDh8uaQ5OJG9GUDsp9YKSQNt69rjucc.jpg",
-  "Spaghetti Carbonara":
-    "https://as1.ftcdn.net/v2/jpg/06/00/16/22/1000_F_600162257_rnJb3XPSr3arrHECJlb47cnMrNvA76Ys.jpg",
-  "Grilled Salmon":
-    "https://as1.ftcdn.net/v2/jpg/03/25/35/08/1000_F_325350805_D8PVU73qs1dj5TdWgm9IpuAjJ7sgHacK.jpg",
-  "Chocolate Lava Cake":
-    "https://as1.ftcdn.net/v2/jpg/06/45/68/86/1000_F_645688685_jeEJGhKe4TQWZuPEyPVpcga5u9WFRpga.jpg",
-  "Margherita Pizza":
-    "https://t4.ftcdn.net/jpg/02/16/71/25/240_F_216712544_4XA06NXDDg9bBWrtCQ1I2NYn8cIrnZ2h.jpg",
-  "Pepperoni Pizza":
-    "https://as1.ftcdn.net/v2/jpg/02/16/78/88/1000_F_216788898_nP9aPoisuMzj3IvSKGxJAyCRUiSX1PGe.jpg",
+  "Caesar Salad": "/images/caesar_salad.jpg",
+  "Spaghetti Carbonara": "/images/spag_carbonara.jpg",
+  "Grilled Salmon": "/images/grilled_salmon.jpg",
+  "Chocolate Lava Cake": "/images/choco_lava_cake.jpg",
+  "Margherita Pizza": "/images/margherita_pizza.jpg",
+  "Pepperoni Pizza": "/images/pepperoni_pizza.jpg",
 };
 
 export default function FoodMenuPage() {
@@ -37,7 +33,7 @@ export default function FoodMenuPage() {
     Array(foodItems.length).fill(1),
   );
   const [orders, setOrders] = useState<
-    Array<{ itemName: string; quantity: number }>
+    Array<{ id: number; itemName: string; quantity: number }>
   >([]);
 
   useEffect(() => {
@@ -51,6 +47,7 @@ export default function FoodMenuPage() {
         console.error("Error fetching menu items: ", error);
       });
   }, []);
+  console.log(orders);
 
   const addQuantity = (itemName: string) => {
     setQuantities((prevQuantities) => {
@@ -87,7 +84,11 @@ export default function FoodMenuPage() {
     {},
   );
 
-  const handleAddToBasket = (itemName: string, quantity: number) => {
+  const handleAddToBasket = (
+    id: number,
+    itemName: string,
+    quantity: number,
+  ) => {
     setOrders((prevOrders) => {
       const existingOrder = prevOrders.find(
         (order) => order.itemName === itemName,
@@ -99,14 +100,10 @@ export default function FoodMenuPage() {
             : order,
         );
       } else {
-        return [...prevOrders, { itemName, quantity }];
+        return [...prevOrders, { id, itemName, quantity }];
       }
     });
   };
-
-  useEffect(() => {
-    console.log(orders);
-  }, [orders]);
 
   return (
     <div className="w-[80%] m-auto text-center">
@@ -124,9 +121,11 @@ export default function FoodMenuPage() {
                 className="border-[1px] border-[#ccc] rounded-lg text-left h-[340px] flex flex-col justify-between p-2"
               >
                 <div className="w-full h-[150px] relative">
-                  <img
+                  <Image
                     src={imageMapping[item.name]}
                     alt={item.name}
+                    width={100}
+                    height={300}
                     className="mx-auto object-cover h-full w-full"
                   />
                 </div>
@@ -154,6 +153,7 @@ export default function FoodMenuPage() {
                 <button
                   onClick={() =>
                     handleAddToBasket(
+                      item.id,
                       item.name,
                       quantities[
                         foodItems.findIndex((i) => i.name === item.name)
