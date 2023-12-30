@@ -172,7 +172,9 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
                 <TableCell className="font-medium">{index + 1}</TableCell>
                 <TableCell>{lineItem.name}</TableCell>
                 <TableCell>{lineItem.quantity}</TableCell>
-                <TableCell className="text-right">{lineItem.price}</TableCell>
+                <TableCell className="text-right">
+                  {Number(lineItem.price).toFixed(2)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -180,10 +182,12 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
             <TableRow>
               <TableCell colSpan={3}>Total</TableCell>
               <TableCell className="text-right">
-                {lineItems.reduce(
-                  (total, item) => total + Number(item.price) * item.quantity,
-                  0,
-                )}
+                {Number(
+                  lineItems.reduce(
+                    (total, item) => total + Number(item.price) * item.quantity,
+                    0,
+                  ),
+                ).toFixed(2)}
               </TableCell>
             </TableRow>
           </TableFooter>
