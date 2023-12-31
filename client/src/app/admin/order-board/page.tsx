@@ -59,14 +59,14 @@ export default function OrderBoard() {
   });
 
   return (
-    <main>
-      <nav className="border border-white text-center overflow-hidden">
+    <main className="flex flex-col h-screen w-screen md:overflow-x-scroll border border-pink-500 ">
+      <nav className="text-lg text-center overflow-hidden border border-green-500">
         Order Board
       </nav>
-      <div className="flex flex-row h-full border border-red-500 overflow-x-scroll pt-3 gap-4">
+      <div className="border border-green-500 flex flex-col m-auto md:flex-row md:gap-4 md:overflow-x-scroll gap-5 h-full py-6 px-3">
         {groupedData.map(
-          (lineItems: any[], index: React.Key | null | undefined) => (
-            <div key={index} className="flex-initial">
+          (lineItems: LineItem[], index: React.Key | null | undefined) => (
+            <div key={index}>
               <OrderCard lineItems={lineItems} />
             </div>
           ),

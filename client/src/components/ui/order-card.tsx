@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import {
   Table,
   TableBody,
@@ -19,7 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import {
   Dialog,
   DialogClose,
@@ -82,10 +80,10 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
   }
 
   return (
-    <Card className="bg-slate-900 w-[400px]">
+    <Card className="bg-slate-900 w-auto md:w-[450px] max-h-full overflow-y-scroll">
       <CardHeader className="flex-row">
         <CardTitle className="flex flex-row items-center w-full">
-          <div className="basis-[90%]">INVOICE #{lineItems[0]?.id}</div>
+          <div className="basis-[90%]">INVOICE #{lineItems[0].id}</div>
           <Dialog>
             <DialogTrigger asChild>
               <Button
@@ -100,7 +98,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
                 <DialogTitle>Warning!</DialogTitle>
                 <DialogDescription>
                   Would you like to cancel this order from invoice number{" "}
-                  {lineItems[0]?.id}?
+                  {lineItems[0].id}?
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
@@ -108,7 +106,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
                   <Button
                     type="submit"
                     onClick={async () => {
-                      await handleCancel(lineItems[0]?.id);
+                      await handleCancel(lineItems[0].id);
                     }}
                   >
                     Cancel Order
@@ -120,27 +118,26 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-sm">Table number: {lineItems[0]?.table_num}</p>
-        <p className="text-sm">Created at: {lineItems[0]?.date_format}</p>
-        <p className="text-sm">Comment: {lineItems[0]?.comment}</p>
-        <br />
-        <div className="flex justify-center">
+        <p className="text-sm">Table number: {lineItems[0].table_num}</p>
+        <p className="text-sm">Created at: {lineItems[0].date_format}</p>
+        <p className="text-sm">Comment: {lineItems[0].comment}</p>
+        <div className="flex justify-center mt-2 mb-3">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild className="">
+            <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 className="bg-slate-800 border-slate-600"
               >
                 {position.charAt(0).toUpperCase() + position.slice(1) ||
-                  lineItems[0]?.status.charAt(0).toUpperCase() +
-                    lineItems[0]?.status.slice(1)}
+                  lineItems[0].status.charAt(0).toUpperCase() +
+                    lineItems[0].status.slice(1)}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuLabel>Select Status</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuRadioGroup
-                value={position || lineItems[0]?.status}
+                value={position || lineItems[0].status}
                 onValueChange={handleStatusChange}
               >
                 <DropdownMenuRadioItem value="waiting for payment">
@@ -162,13 +159,12 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <br />
-        <Table>
+        <Table className="md:text-sm text-xs">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px]">#</TableHead>
-              <TableHead className="w-auto">food name</TableHead>
-              <TableHead className="w-[50px]">quantity</TableHead>
+              <TableHead className="w-0">#</TableHead>
+              <TableHead>food name</TableHead>
+              <TableHead className="w-0">qty</TableHead>
               <TableHead className="text-right">price</TableHead>
             </TableRow>
           </TableHeader>
@@ -181,7 +177,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
                   {lineItem.quantity}
                 </TableCell>
                 <TableCell className="text-right">
-                  {"₱ " + Number(lineItem.price).toFixed(2)}
+                  ₱ {Number(lineItem.price).toFixed(2)}
                 </TableCell>
               </TableRow>
             ))}
@@ -190,14 +186,13 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
             <TableRow>
               <TableCell colSpan={3}>Total</TableCell>
               <TableCell className="text-right">
-                {"₱ " +
-                  Number(
-                    lineItems.reduce(
-                      (total, item) =>
-                        total + Number(item.price) * item.quantity,
-                      0,
-                    ),
-                  ).toFixed(2)}
+                ₱{" "}
+                {Number(
+                  lineItems.reduce(
+                    (total, item) => total + Number(item.price) * item.quantity,
+                    0,
+                  ),
+                ).toFixed(2)}
               </TableCell>
             </TableRow>
           </TableFooter>
