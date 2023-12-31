@@ -217,21 +217,24 @@ async function serverStart() {
     });
   });
 
-  app.patch("/updateStatus", async (request: Request, response: Response) => {
-    const { status, invoices } = request.body;
+  app.patch(
+    "/invoices/status",
+    async (request: Request, response: Response) => {
+      const { status, invoices } = request.body;
 
-    const result = await pool.query(
-      `
+      const result = await pool.query(
+        `
         UPDATE invoices
         SET status = $1
         FROM line_items
         WHERE invoices.id = line_items.invoice_id AND line_items.invoice_id = $2;
       `,
-      [status, invoices],
-    );
+        [status, invoices],
+      );
 
-    return response.json({ status });
-  });
+      return response.json({ status });
+    },
+  );
 
   app.listen(port, () => {
     console.log(`Listening on http://${host}:${port}`);

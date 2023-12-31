@@ -58,12 +58,14 @@ export default function OrderBoard() {
     groupedData[id - 1].push(item);
   });
 
+  console.log(groupedData, "goruped");
+
   return (
-    <main className="flex flex-col h-screen w-screen md:overflow-x-scroll border border-pink-500 ">
-      <nav className="text-lg text-center overflow-hidden border border-green-500">
+    <main className="flex flex-col h-max md:h-screen w-screen md:overflow-x-scroll">
+      <nav className="fixed top-0 left-0 right-0 text-lg text-center overflow-hidden">
         Order Board
       </nav>
-      <div className="border border-green-500 flex flex-col m-auto md:flex-row md:gap-4 md:overflow-x-scroll gap-5 h-full py-6 px-3">
+      <div className="w-screen flex flex-col m-auto md:flex-row md:gap-4 md:overflow-x-scroll gap-5 h-full pt-14 pb-8 px-3">
         {groupedData.map(
           (lineItems: LineItem[], index: React.Key | null | undefined) => (
             <div key={index}>
