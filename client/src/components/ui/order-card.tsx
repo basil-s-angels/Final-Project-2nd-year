@@ -46,7 +46,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
         },
         body: JSON.stringify({
           status: newStatus,
-          invoices: lineItems[0]?.id,
+          invoices: lineItems[0].id,
         }),
       },
     );
@@ -126,11 +126,9 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="bg-slate-800 border-slate-600"
+                className="bg-slate-800 border-slate-600 capitalize"
               >
-                {position.charAt(0).toUpperCase() + position.slice(1) ||
-                  lineItems[0].status.charAt(0).toUpperCase() +
-                    lineItems[0].status.slice(1)}
+                {position || lineItems[0].status}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">

@@ -9,6 +9,7 @@ import { Pool } from "pg";
 import "dotenv/config";
 
 import { User } from "./types";
+import DateTimeConverter from "./dateTimeConverter";
 
 async function serverStart() {
   const app = express();
@@ -172,31 +173,7 @@ async function serverStart() {
         WHERE invoices.status != 'completed'
       `);
 
-    const newRows = rows.map((item) => {
-      const splitted = String(item.created_at).split(" ");
-      const weekDay = splitted[0];
-      const month = splitted[1];
-      const date = splitted[2];
-      const year = splitted[3];
-
-      let hour = Number(splitted[4].slice(0, 2));
-      let abbreviation = "AM";
-      const minute = splitted[4].slice(3, 5);
-
-      if (hour >= 13) {
-        hour -= 12;
-        abbreviation = "PM";
-      } else if (hour === 0) {
-        hour = 12;
-      } else if (hour === 12) {
-        abbreviation = "PM";
-      }
-
-      return {
-        ...item,
-        date_format: `[${hour}:${minute} ${abbreviation}] ${month} ${date}, ${year} (${weekDay})`,
-      };
-    });
+    const newRows = rows.map((item) => DateTimeConverter(item));
 
     console.log(newRows);
     return response.json(newRows);
@@ -233,6 +210,60 @@ async function serverStart() {
       );
 
       return response.json({ status });
+    },
+  );
+
+  app.get(
+    "/invoices/invoiceID/:query",
+    async (request: Request, response: Response) => {
+      const { rows } = await pool.query(
+        `
+        SELECT
+          invoices.*,
+          foods.name,
+          line_items.quantity,
+          foods.price
+        FROM line_items
+        INNER JOIN invoices
+        ON line_items.invoice_id = invoices.id
+        INNER JOIN foods
+        ON line_items.food_id = foods.id
+        WHERE invoices.status != 'completed'
+        AND invoices.id = $1
+      `,
+        [request.params.query],
+      );
+
+      const newRows = rows.map((item) => DateTimeConverter(item));
+
+      return response.json(newRows);
+    },
+  );
+
+  app.get(
+    "/invoices/tableNum/:query",
+    async (request: Request, response: Response) => {
+      const { rows } = await pool.query(
+        `
+        SELECT
+          invoices.*,
+          foods.name,
+          line_items.quantity,
+          foods.price
+        FROM line_items
+        INNER JOIN invoices
+        ON line_items.invoice_id = invoices.id
+        INNER JOIN foods
+        ON line_items.food_id = foods.id
+        WHERE invoices.status != 'completed'
+        AND invoices.table_num = $1
+      `,
+        [request.params.query],
+      );
+
+      const newRows = rows.map((item) => DateTimeConverter(item));
+
+      return response.json(newRows);
     },
   );
 

@@ -61,3 +61,25 @@ bun dev
 ```
 
 You can now fetch data from [http://localhost:8080](http://localhost:8080)
+
+## Database Migration
+
+Open a new terminal and run:
+
+```bash
+cd server
+```
+
+Then run:
+
+```bash
+dbmate up
+```
+
+This will load the migrations according to the DATABASE_URL from ./server/.env file. The URL is structured as follows:
+
+```bash
+DATABASE_URL="protocol://username:password@host:port/database_name?options"
+```
+
+Refer to the [official dbmate documentation](https://github.com/amacneil/dbmate#usage) for more info.
