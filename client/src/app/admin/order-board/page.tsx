@@ -25,10 +25,7 @@ export default function OrderBoard() {
           if (!initialLoad && results.length > prevLineItemsLength.current) {
             alert("New order has arrived!");
           }
-          console.log(prevLineItemsLength.current, "old");
           prevLineItemsLength.current = results.length;
-          console.log(prevLineItemsLength.current, "new");
-          console.log(initialLoad);
           setLineItems(results);
         })
         .catch((error) => console.error(error));
@@ -49,7 +46,7 @@ export default function OrderBoard() {
     };
   }, [initialLoad]);
 
-  let groupedData: any[] = [];
+  let groupedData: Array<LineItem[]> = [];
 
   if (!searchResult) {
     lineItems.forEach((item) => {
@@ -70,9 +67,6 @@ export default function OrderBoard() {
       groupedData[id - 1].push(item);
     });
   }
-
-  console.log(groupedData, "goruped");
-  console.log(searchResult, "lifted?");
 
   return (
     <main className="flex flex-col h-max md:h-screen w-screen md:overflow-x-scroll">

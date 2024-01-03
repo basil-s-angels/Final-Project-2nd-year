@@ -1,4 +1,6 @@
-export default function DateTimeConverter(item: { created_at: any }) {
+import { LineItem } from "./types";
+
+export default function DateTimeConverter(item: LineItem) {
   const splitted = String(item.created_at).split(" ");
   const weekDay = splitted[0];
   const month = splitted[1];

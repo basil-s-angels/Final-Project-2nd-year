@@ -8,7 +8,7 @@ import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import { Pool } from "pg";
 import "dotenv/config";
 
-import { User } from "./types";
+import { LineItem, User } from "./types";
 import DateTimeConverter from "./dateTimeConverter";
 
 async function serverStart() {
@@ -310,7 +310,7 @@ async function serverStart() {
           [`%${request.params.query}%`],
         );
 
-        const newRows = rows.map((item) => DateTimeConverter(item));
+        const newRows: LineItem[] = rows.map((item) => DateTimeConverter(item));
 
         return response.json(newRows);
       } catch (error) {
