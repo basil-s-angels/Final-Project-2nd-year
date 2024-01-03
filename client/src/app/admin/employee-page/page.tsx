@@ -1,6 +1,9 @@
 "use client";
 // EmployeeDashboard.jsx
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+import { UserJWT } from "@/lib/types";
+import fetchUser from "@/lib/getUser";
 
 // Interface definitions
 
@@ -73,7 +76,18 @@ const orders: Order[] = [
 ];
 
 export default function EmployeeDashboard() {
-  const [isOpen, setIsOpen] = useState(false);
+  let [isOpen, setIsOpen] = useState(false);
+  let [user, setUser] = useState<UserJWT | null>(null);
+
+  useEffect(() => {
+    fetchUser()
+      .then((user) => {
+        setUser(user);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   const calculateTotalAmount: () => number = () => {
     const totalAmount = orders.reduce((sum, order) => sum + order.amount, 0);
@@ -95,9 +109,11 @@ export default function EmployeeDashboard() {
           <div className="mb-4 grid text-white grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4 md:gap-12">
             <div className="bg-white p-4 rounded shadow">
               <p className="text-lg font-semibold text-black">
-                Name: {employees.name}
+                Name: {user && user.firstName + " " + user.lastName}
               </p>
-              <p className="text-lg text-black">ID: {employees.id}</p>
+              <p className="text-lg text-black">
+                Position: {user && user.position}
+              </p>
             </div>
           </div>
         </div>
