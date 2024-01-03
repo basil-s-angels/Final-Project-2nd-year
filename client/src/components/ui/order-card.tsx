@@ -38,7 +38,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
   async function handleStatusChange(newStatus: SetStateAction<string>) {
     setPosition(newStatus);
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/invoices/status`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/invoices`,
       {
         method: "PATCH",
         headers: {
