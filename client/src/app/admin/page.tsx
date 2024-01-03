@@ -21,7 +21,7 @@ export default function AdminHome() {
 
   return (
     <main>
-      <h1>if you see this, that means i am logged in!!!!!</h1>
+      <h1>if you see this, that means i am logged in and an admin!!!!!</h1>
       hello {user && user.firstName}!<br />
       <Logout />
     </main>
