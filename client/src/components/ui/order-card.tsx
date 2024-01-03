@@ -80,7 +80,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
   }
 
   return (
-    <Card className="bg-slate-900 w-auto md:w-[450px] max-h-full overflow-y-scroll">
+    <Card className="bg-slate-900 w-auto md:w-[450px] max-h-full overflow-y-scroll shadow-lg shadow-slate-700/60">
       <CardHeader className="flex-row">
         <CardTitle className="flex flex-row items-center w-full">
           <div className="basis-[90%]">INVOICE #{lineItems[0].id}</div>
@@ -175,7 +175,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
                   {lineItem.quantity}
                 </TableCell>
                 <TableCell className="text-right">
-                  ₱ {Number(lineItem.price).toFixed(2)}
+                  ₱ {(lineItem.quantity * Number(lineItem.price)).toFixed(2)}
                 </TableCell>
               </TableRow>
             ))}

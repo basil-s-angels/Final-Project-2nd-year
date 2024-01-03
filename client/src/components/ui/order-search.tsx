@@ -21,30 +21,19 @@ export default function OrderSearch({ setSearchResult }: any) {
   const [inputValue, setInputValue] = useState<string>("");
 
   return (
-    <main className="flex flex-row">
+    <main className="flex flex-row mt-2">
       <Input
         type="text"
         placeholder="Search here:"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
       />
-      {inputValue && (
-        <Button
-          variant="destructive"
-          onClick={() => {
-            setInputValue("");
-            setSearchResult(null);
-          }}
-        >
-          Reset
-        </Button>
-      )}
       <Button
+        className="ml-2"
         variant="outline"
         size="icon"
         onClick={async () => {
           handleSearch(selected, inputValue).then((result) => {
-            console.log(result, "from backend shesh");
             setSearchResult(result);
           });
         }}
@@ -65,9 +54,24 @@ export default function OrderSearch({ setSearchResult }: any) {
             <DropdownMenuRadioItem value="tableNum">
               Table Number
             </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="foodName">
+              Food Name
+            </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
+      {inputValue && (
+        <Button
+          className="ml-2"
+          variant="destructive"
+          onClick={() => {
+            setInputValue("");
+            setSearchResult(null);
+          }}
+        >
+          Reset
+        </Button>
+      )}
     </main>
   );
 }

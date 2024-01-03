@@ -159,7 +159,8 @@ async function serverStart() {
   });
 
   app.get("/invoices", async (request: Request, response: Response) => {
-    const { rows } = await pool.query(`
+    const { rows } = await pool.query(
+      `
         SELECT
           invoices.*,
           foods.name,
@@ -171,7 +172,8 @@ async function serverStart() {
         INNER JOIN foods
         ON line_items.food_id = foods.id
         WHERE invoices.status != 'completed'
-      `);
+      `,
+    );
 
     const newRows = rows.map((item) => DateTimeConverter(item));
 
@@ -204,7 +206,8 @@ async function serverStart() {
         UPDATE invoices
         SET status = $1
         FROM line_items
-        WHERE invoices.id = line_items.invoice_id AND line_items.invoice_id = $2;
+        WHERE invoices.id = line_items.invoice_id
+        AND line_items.invoice_id = $2;
       `,
         [status, invoices],
       );
@@ -216,54 +219,104 @@ async function serverStart() {
   app.get(
     "/invoices/invoiceID/:query",
     async (request: Request, response: Response) => {
-      const { rows } = await pool.query(
-        `
-        SELECT
-          invoices.*,
-          foods.name,
-          line_items.quantity,
-          foods.price
-        FROM line_items
-        INNER JOIN invoices
-        ON line_items.invoice_id = invoices.id
-        INNER JOIN foods
-        ON line_items.food_id = foods.id
-        WHERE invoices.status != 'completed'
-        AND invoices.id = $1
-      `,
-        [request.params.query],
-      );
+      try {
+        const { rows } = await pool.query(
+          `
+          SELECT
+            invoices.*,
+            foods.name,
+            line_items.quantity,
+            foods.price
+          FROM line_items
+          INNER JOIN invoices
+          ON line_items.invoice_id = invoices.id
+          INNER JOIN foods
+          ON line_items.food_id = foods.id
+          WHERE invoices.status != 'completed'
+          AND invoices.id = $1
+        `,
+          [request.params.query],
+        );
 
-      const newRows = rows.map((item) => DateTimeConverter(item));
+        const newRows = rows.map((item) => DateTimeConverter(item));
 
-      return response.json(newRows);
+        return response.json(newRows);
+      } catch (error) {
+        console.error(error);
+        return response.json([]);
+      }
     },
   );
 
   app.get(
     "/invoices/tableNum/:query",
     async (request: Request, response: Response) => {
-      const { rows } = await pool.query(
-        `
-        SELECT
-          invoices.*,
-          foods.name,
-          line_items.quantity,
-          foods.price
-        FROM line_items
-        INNER JOIN invoices
-        ON line_items.invoice_id = invoices.id
-        INNER JOIN foods
-        ON line_items.food_id = foods.id
-        WHERE invoices.status != 'completed'
-        AND invoices.table_num = $1
-      `,
-        [request.params.query],
-      );
+      try {
+        const { rows } = await pool.query(
+          `
+          SELECT
+            invoices.*,
+            foods.name,
+            line_items.quantity,
+            foods.price
+          FROM line_items
+          INNER JOIN invoices
+          ON line_items.invoice_id = invoices.id
+          INNER JOIN foods
+          ON line_items.food_id = foods.id
+          WHERE invoices.status != 'completed'
+          AND invoices.table_num = $1
+        `,
+          [request.params.query],
+        );
 
-      const newRows = rows.map((item) => DateTimeConverter(item));
+        const newRows = rows.map((item) => DateTimeConverter(item));
 
-      return response.json(newRows);
+        return response.json(newRows);
+      } catch (error) {
+        console.error(error);
+        return response.json([]);
+      }
+    },
+  );
+
+  app.get(
+    "/invoices/foodName/:query",
+    async (request: Request, response: Response) => {
+      try {
+        const { rows } = await pool.query(
+          `
+          SELECT
+            invoices.*,
+            foods.name,
+            line_items.quantity,
+            foods.price
+          FROM line_items
+          INNER JOIN invoices
+          ON line_items.invoice_id = invoices.id
+          INNER JOIN foods
+          ON line_items.food_id = foods.id
+          WHERE invoices.status != 'completed'
+          AND invoices.id IN (
+            SELECT invoices.id
+            FROM line_items
+            INNER JOIN invoices
+            ON line_items.invoice_id = invoices.id
+            INNER JOIN foods
+            ON line_items.food_id = foods.id
+            WHERE foods.name ILIKE $1
+          )
+        `,
+          [`%${request.params.query}%`],
+        );
+
+        const newRows = rows.map((item) => DateTimeConverter(item));
+
+        return response.json(newRows);
+      } catch (error) {
+        console.error(error);
+        return response.json([]);
+      }
     },
   );
 

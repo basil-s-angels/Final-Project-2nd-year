@@ -13,7 +13,7 @@ export default function Home() {
     <Card className="bg-slate-800 rounded-xl w-[50%] m-auto mt-8">
       <CardHeader>
         <CardTitle>Basil&apos;s Angels Team Members</CardTitle>
-        <CardDescription>Awesome and pro coders!</CardDescription>
+        <CardDescription>Meet the team!</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-6">
         <div className="flex items-center justify-between space-x-4 text-sm">
