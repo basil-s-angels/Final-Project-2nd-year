@@ -12,7 +12,7 @@ interface CartItem {
 }
 
 type OrdercartProps = {
-  orders: Array<{ itemName: string; quantity: number }>;
+  orders: Array<{ itemName: string; quantity: number; price: number }>;
 };
 
 const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
@@ -25,13 +25,13 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
     setcartItems(orders);
   }, []);
 
-  const addQuantity = (index: number) => {
-    setQuantities((prevQuantities) => {
-      const newQuantities = [...prevQuantities];
-      newQuantities[index] += 1;
-      return newQuantities;
-    });
-  };
+  // const addQuantity = (quantity: number) => {
+  //   setQuantities((prevQuantities) => {
+  //     const newQuantities = [...prevQuantities];
+  //     newQuantities[quantity] += 1;
+  //     return newQuantities;
+  //   });
+  // };
 
   // const handleAddtoCart = (items: Cartitem) =>{
   //   setcartItems([...cartItems, items])
@@ -41,19 +41,19 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
     setcartItems(cartItems.filter((item) => item.id != id));
   };
 
-  const minusQuantity = (index: number): undefined => {
-    if (quantities[index] > 1) {
-      setQuantities((prevQuantities) => {
-        const newQuantities = [...prevQuantities];
-        newQuantities[index] -= 1;
-        return newQuantities;
-      });
-    }
-  };
+  // const minusQuantity = (index: number): undefined => {
+  //   if (quantities[index]> 1) {
+  //     setQuantities((prevQuantities) => {
+  //       const newQuantities = [...prevQuantities];
+  //       newQuantities[index] -= 1;
+  //       return newQuantities;
+  //     });
+  //   }
+  // };
 
   const calculateSubtotal = () => {
     return cartItems.reduce(
-      (total, item, index) => total + item.price * quantities[index],
+      (total, item) => total + item.price * item.quantity,
       0,
     );
   };
@@ -82,107 +82,100 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
   };
 
   return (
-    <div className=" h-screen py-8">
+    <div className=" min-[320px]:py-4 max-[600px] h-screen py-8">
       <div className="container mx-auto px-4">
-        <h1 className=" md:text-2xl sm:text-sm text-white-500 font-semibold mb-4">
+        <h1 className="min-[320px]:text-center max-[600px]:text-lg text-white-500 font-semibold mb-4">
           {" "}
           ORDER SUMMARY
         </h1>
-        <div className="flex flex-col md:flex-row gap-4 pt-8">
+        <div className="flex flex-col md:flex-row gap-3 pt-8">
           <div className="md:w-3/4">
-            <div className="bg-white rounded-lg shadow-md p-6 mb-4">
+            <div className="min-[320px]:py-2 max-[600px] bg-white rounded-lg shadow-md p-6 mb-4">
               <table className="w-full">
                 <thead>
                   <tr>
-                    <th className="md:text-xl sm:text-sm text-left  text-blue-600 font-semibold">
+                    <th className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg text-left text-blue-600 font-semibold pl-5">
                       {" "}
                       Food Name
                     </th>
-                    <th className="md:text-xl sm:text-sm text-left text-blue-600 font-semibold pl-7">
+                    <th className="min-[320px]:text-xs max-[600px]:pr-2 md:text-lg text-left text-blue-600 font-semibold">
                       {" "}
                       Quantity
                     </th>
-                    <th className="md:text-xl sm:text-sm text-left text-blue-600 font-semibold">
+                    <th className="min-[320px]:text-xs max-[600px] md:text-lg text-left text-blue-600 font-semibold">
                       {" "}
                       Total
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {/* {orders.map((item, index) => (
-                    <tr key={item.id}>
+                  {orders.map((order, index) => (
+                    <tr key={index}>
                       <td className="py-4">
                         <div className="flex-items-center">
-                          <span className=" text-blue-800 font-semibold pl-4">
+                          <span className="min-[320px]:text-xs max-[600px]:ml-0 md:text-lg text-center text-blue-800 font-semibold ml-2">
                             {" "}
-                            {item.name}{" "}
+                            {order.itemName}{" "}
                           </span>
                         </div>
                       </td>
-                      <td className="xl:text-lg text-sm py-4 text-gray-700">
-                        {" "}
-                        {item.price.toFixed(2)}
-                      </td>
                       <td className="py-4">
                         <div className="flex-items-center">
-                          <button
+                          {/* <button
                             className="md:border rounded-md md:py-2 md:px-4 md:mr-2 ml-2 text-gray-700 "
                             onClick={minusQuantity(index)}
                           >
                             -
-                          </button>
-                          <span className="text-center text-gray-700 w-9 mx-2">
-                            {quantities[index]}
+                          </button> */}
+                          <span className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg text-gray-700 w-9 mx-2 md:pl-6">
+                            {order.quantity}
                           </span>
-                          <button
+                          {/* <button
                             className="md:border rounded-md md:py-2 md:px-4 md:ml-2 text-gray-700 "
                             onClick={() => addQuantity(index)}
                           >
                             +
-                          </button>
+                          </button> */}
                         </div>
                       </td>
-                      <td className="md:text-xl text-sm text-gray-800 py-4">
-                        {(item.price * quantities[index]).toFixed()}
+                      <td className="min-[320px]:text-xs max-[600px] md:text-lg text-left text-sm text-gray-800 py-4">
+                        {(order.price * order.quantity).toFixed(2)}
                       </td>
                     </tr>
-                  ))} */}
-                  {orders.map((order, index) => (
-                    <p key={index} className="text-black">
-                      {order.quantity}x {order.itemName}
-                    </p>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-          <div className="md:w-1/4">
+          <div className="min-[820px] max-[600px]">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-lg text-gray-600 font-semibold mb-4">
+              <h2 className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg text-lg text-gray-600 font-semibold mb-4">
                 {" "}
                 Summary
               </h2>
               <div className="flex justify-between mb-2">
-                <span className="text-blue-600 text-xl">Subtotal</span>
-                <span className="text-gray-600">
+                <span className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg text-blue-600 text-xl">
+                  Subtotal
+                </span>
+                <span className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg text-gray-600 text-center">
                   {calculateSubtotal().toFixed(2)}
                 </span>
               </div>
               <div>
-                <h2 className="text-lg text-gray-600 font-semibold mb-4">
+                <h2 className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg text-lg text-gray-600 font-semibold mb-4">
                   {" "}
                   Special Instructions
                 </h2>
                 <input
-                  type="text"
-                  className="text-gray-600 w-full h-20 px-3 border-gray-600"
+                  type="textarea"
+                  className="break-all text-gray-600 w-full h-20 px-3 border-gray-600"
                   placeholder="Insert Special Message here"
                   value={comment}
                   onChange={(event) => setComment(event.target.value)}
                 />
               </div>
               <button
-                className="bg-blue-500 text-white-700 py-2 px-4 rounded-lg mt-4 w-full"
+                className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg bg-blue-500 text-white-700 py-2 px-3 rounded-lg mt-4 w-full"
                 onClick={handleCheckout}
               >
                 {" "}

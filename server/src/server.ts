@@ -155,7 +155,7 @@ async function serverStart() {
 
   app.get("/order", async (request: Request, response: Response) => {
     try {
-      const result = await pool.query("SELECT price FROM foods");
+      const result = await pool.query("SELECT name, price FROM foods");
       response.json(result.rows);
     } catch (error) {
       console.log(error);
