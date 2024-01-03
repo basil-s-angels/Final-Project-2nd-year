@@ -26,13 +26,9 @@ export default function Form() {
           }),
         },
       );
-
       if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          console.log("success!", result, response);
-          router.push("/admin/login");
-        }
+        console.log("success!", response);
+        router.push("/admin/login");
       }
     } catch (error) {
       console.error("An error occurred:", error);

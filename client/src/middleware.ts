@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // console.log(request, "from middleware")
   const pathname = request.nextUrl.pathname;
 
   const response = await fetch(
@@ -21,13 +22,27 @@ export async function middleware(request: NextRequest) {
 
   if (response.ok) {
     const user = await response.json();
-    console.log(user, "gotten from middleware");
-    if (pathname === "/admin/login" || pathname === "/admin/signup") {
-      return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_CLIENT_URL}/admin`,
-      );
+    console.log(user.decoded, "gotten from middleware");
+    if (user.decoded.position === "admin") {
+      if (pathname === "/admin/login" || pathname === "/admin/signup") {
+        return NextResponse.redirect(
+          `${process.env.NEXT_PUBLIC_CLIENT_URL}/admin`,
+        );
+      } else {
+        return NextResponse.next();
+      }
     } else {
-      return NextResponse.next();
+      if (
+        pathname === "/admin" ||
+        pathname === "/admin/login" ||
+        pathname === "/admin/signup"
+      ) {
+        return NextResponse.redirect(
+          `${process.env.NEXT_PUBLIC_CLIENT_URL}/admin/employee-page`,
+        );
+      } else {
+        return NextResponse.next();
+      }
     }
   } else {
     if (
