@@ -2,8 +2,35 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface Invoice {
+  total_price: number;
   quantity: number;
   id: number;
   name: string;
@@ -14,13 +41,6 @@ interface Invoice {
   status: string;
 }
 
-interface Order {
-  orderDate: string;
-  id: number;
-  InvoiceNumber: string;
-  amount: number;
-}
-
 interface EmployeeData {
   id: number;
   name: string;
@@ -29,11 +49,11 @@ interface EmployeeData {
 export default function EmployeeDashboard() {
   const [employeeData, setEmployeeData] = useState<EmployeeData | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [test, setTest] = useState<any[]>([]);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(
-    null,
-  );
-  const [filter, setFilter] = useState<string>("");
+  const [groupData, setGroupData] = useState<any[]>([]);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee`)
@@ -42,20 +62,65 @@ export default function EmployeeDashboard() {
         console.log(data, "from useeffect");
         setEmployeeData(data);
         setInvoices(data);
-        setTest(data);
+        setGroupData(data);
       });
   }, []);
 
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee:description`)
+  async function handleClick(invoiceId: number) {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee/${invoiceId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data, "from useeffect");
-        setEmployeeData(data);
-        setInvoices(data);
-        setTest(data);
+        console.log(data, "rows from the database");
+        setSelectedInvoice(data);
       });
-  }, []);
+  }
+
+  async function handleYearClick(year: number) {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee/${year}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "rows from the database");
+        setSelectedYear(year.toString()); // Set the selected year
+      });
+  }
+
+  async function handleMonthClick(month: string) {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee/${month}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "rows from the database");
+        setSelectedMonth(month); // Set the selected month
+      });
+  }
+
+  async function handleDayClick(day: string) {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee/${day}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "rows from the database");
+        setSelectedDay(day); // Set the selected day
+      });
+  }
 
   const totalAmountForAllOrders = () => {
     return invoices.reduce(
@@ -66,8 +131,7 @@ export default function EmployeeDashboard() {
 
   let groupedData: any[] = [];
 
-  test.forEach((item) => {
-    console.log(item, "item from foreach");
+  groupData.forEach((item) => {
     let id = item.id;
 
     if (!groupedData[id - 1]) {
@@ -76,31 +140,25 @@ export default function EmployeeDashboard() {
     groupedData[id - 1].push(item);
   });
 
-  console.log(groupedData, "this is grouped!!");
+  let filteredData: any[] = [];
 
-  const filterInvoices = (filter: string) => {
-    const currentDate = new Date();
-    return invoices.filter((invoice) => {
-      const invoiceDate = new Date(invoice.created_at);
-      switch (filter) {
-        case "daily":
-          return (
-            invoiceDate.getDate() === currentDate.getDate() &&
-            invoiceDate.getMonth() === currentDate.getMonth() &&
-            invoiceDate.getFullYear() === currentDate.getFullYear()
-          );
-        case "monthly":
-          return (
-            invoiceDate.getMonth() === currentDate.getMonth() &&
-            invoiceDate.getFullYear() === currentDate.getFullYear()
-          );
-        case "yearly":
-          return invoiceDate.getFullYear() === currentDate.getFullYear();
-        default:
-          return true; // Show all invoices
-      }
+  if (selectedYear && selectedMonth && selectedDay) {
+    // Filter the data based on the selected year, month, and day
+    filteredData = groupedData.filter((item) => {
+      const date = new Date(item[0].created_at);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1; // Months are zero-based in JS
+      const day = date.getDate();
+      const yearMatches = year.toString() === selectedYear;
+      const monthMatches = month.toString() === selectedMonth;
+      const dayMatches = day.toString() === selectedDay;
+      return yearMatches && monthMatches && dayMatches;
     });
-  };
+  } else {
+    // Handle the case when not all three (year, month, and day) are selected
+    // Set filteredData to the entire data in that case
+    filteredData = groupedData;
+  }
 
   return (
     <div className="min-h-screen p-4 md:p-8 bg-gray-900 text-white">
@@ -123,121 +181,228 @@ export default function EmployeeDashboard() {
             </h2>
             Filter Orders
             <div className="flex justify-center space-x-4">
-              <button
-                className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
+              <Popover>
+                <PopoverTrigger
+                  className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
                 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
-                onClick={() => setFilter("daily")}
-              >
-                Daily
-              </button>
+                >
+                  {selectedYear || "Year"}
+                </PopoverTrigger>
+                <PopoverContent>
+                  {[2020, 2021, 2022, 2023, 2024].map((year, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleYearClick(year)}
+                      className="block w-full text-left px-4 py-2 hover:bg-green-500 hover:text-white"
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
 
-              <button
-                className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
+              <Popover>
+                <PopoverTrigger
+                  className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
                 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
-                onClick={() => setFilter("monthly")}
-              >
-                Monthly
-              </button>
+                >
+                  {" "}
+                  Month
+                </PopoverTrigger>
+                <PopoverContent className="max-h-60 overflow-auto">
+                  {[
+                    "01",
+                    "02",
+                    "03",
+                    "04",
+                    "05",
+                    "06",
+                    "07",
+                    "08",
+                    "09",
+                    "10",
+                    "11",
+                    "12",
+                  ].map((month, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleMonthClick(month)}
+                      className="block w-full text-left px-4 py-2 hover:bg-green-500 hover:text-white"
+                    >
+                      {month}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
 
-              <button
-                className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
+              <Popover>
+                <PopoverTrigger
+                  className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
                 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
-                onClick={() => setFilter("yearly")}
-              >
-                Yearly
-              </button>
+                >
+                  {" "}
+                  Day
+                </PopoverTrigger>
+                <PopoverContent className="max-h-60 overflow-auto">
+                  {Array.from({ length: 31 }, (_, i) =>
+                    (i + 1).toString().padStart(2, "0"),
+                  ).map((day, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleDayClick(day)}
+                      className="block w-full text-left px-4 py-2 hover:bg-green-500 hover:text-white"
+                    >
+                      {day}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
             </div>
-            {/* Display total amount */}
-            <div className="text-xl font-semibold mb-4">
-              Total Amount: P{totalAmountForAllOrders().toFixed(2)}
+            {/* Display total amount for "Done" orders */}
+            <div className="mb-4 text-left">
+              <p className="text-2xl font-bold">
+                Total Amount: P{totalAmountForAllOrders().toFixed(2)}
+              </p>
             </div>
+            {/* Display Done Orders table */}
             <div className="overflow-x-auto">
               <table className="min-w-full bg-gray-700 rounded-lg shadow overflow-hidden">
-                <thead className="bg-gray-600 text-gray-200">
-                  <tr>
-                    <th className="py-2 px-4 md:py-3 md:px-6 text-left">
-                      Invoice No.
-                    </th>
-                    <th className="py-2 px-4 md:py-3 md:px-6 text-center">
-                      Order Date
-                    </th>
-                    <th className="py-2 px-4 md:py-3 md:px-6 text-right">
-                      Amount
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="text-gray-200">
-                  {groupedData.map((invoice: any[], index) => (
-                    <tr
-                      key={index}
-                      onClick={() => {
-                        setSelectedInvoiceId(invoice[0].id);
-                      }}
-                    >
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-left">
-                        {invoice[0]?.id}
-                      </td>
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-center">
-                        {invoice[0]?.created_at}
-                      </td>
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-right">
-                        P
-                        {invoice
-                          .reduce(
-                            (total, item) =>
-                              total + Number(item.price) * item.quantity,
-                            0,
-                          )
-                          .toFixed(2)}
-                      </td>
-                      {selectedInvoiceId === invoice[0].id && (
-                        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center rounded bg-gray-800 p-4 ring-2 ring-gray-200">
-                          <div className="m-auto rounded bg-gray-800 p-4 ring-2 ring-gray-200">
-                            <div>
-                              <h1>Invoice #{invoice[0].id}</h1>
-                              {invoice.map((lineItem, index) => (
-                                <div
-                                  key={index + 1}
-                                  className="rounded bg-gray-800 p-2 ring-2 ring-gray-200"
-                                >
-                                  {lineItem.quantity}x {lineItem.name}
-                                  <br />
-                                  price: {lineItem.price *
-                                    lineItem.quantity}{" "}
-                                  <br />
-                                </div>
-                              ))}
-                            </div>
-                            <br />
-                            <div className="rounded bg-gray-800 p-2 ring-2 ring-gray-200">
-                              Total: P
-                              {invoice
-                                .reduce(
-                                  (total, lineItem) =>
-                                    total + lineItem.price * lineItem.quantity,
-                                  0,
-                                )
-                                .toFixed(2)}
-                            </div>
-                            <div className="rounded bg-gray-800 p-2 ring-2 ring-gray-200">
-                              {" "}
-                              comment: {invoice[0].comment}
-                            </div>
-                            <div className="rounded bg-gray-800 p-2 ring-2 ring-gray-200">
-                              {" "}
-                              status: {invoice[0].status}
-                            </div>
-                            <button className="bg-grey-700 hover:bg-green-700 text-grey font-bold py-2 px-4 rounded ring-2 ring-gray-200">
-                              <a href="/admin/employee-page">
-                                <div>back</div>
-                              </a>
-                            </button>
+                <Table>
+                  <TableCaption>A list of your recent invoices.</TableCaption>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="py-2 px-4 md:py-3 md:px-6 text-left">
+                        Invoice No.
+                      </TableHead>
+                      <TableHead className="py-2 px-4 md:py-3 md:px-6 text-center">
+                        Created at
+                      </TableHead>
+                      <TableHead className="py-2 px-4 md:py-3 md:px-6 text-right">
+                        Amount
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredData.map((invoice: any, index) => (
+                      <Dialog key={index}>
+                        <DialogTrigger asChild>
+                          <div>
+                            <TableRow
+                              className="py-2 px-4 md:py-3 md:px-6 text-left hover:bg-gray-500 cursor-pointer"
+                              onClick={async () => {
+                                console.log("Clicked Invoice:", invoice[0]);
+                                await handleClick(invoice[0]?.id);
+                              }}
+                            >
+                              <TableCell>{invoice[0]?.id}</TableCell>
+                              <TableCell className="py-2 px-4 md:py-3 md:px-6 text-center">
+                                {invoice[0]?.created_at}
+                              </TableCell>
+                              <TableCell className="py-2 px-4 md:py-3 md:px-6 text-right">
+                                P
+                                {Number(
+                                  invoice.reduce(
+                                    (
+                                      total: number,
+                                      item: {
+                                        price: any;
+                                        quantity: number;
+                                      },
+                                    ) =>
+                                      total +
+                                      Number(item.price) * item.quantity,
+                                    0,
+                                  ),
+                                ).toFixed(2)}
+                              </TableCell>
+                            </TableRow>
                           </div>
-                        </div>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Invoice #{invoice[0]?.id}</DialogTitle>
+                            <DialogDescription>
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead className="w-[100px] text-left">
+                                      Num
+                                    </TableHead>
+                                    <TableHead className="text-left">
+                                      Food Name
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                      Quantity
+                                    </TableHead>
+                                    <TableHead className="text-right">
+                                      Price
+                                    </TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {selectedInvoice &&
+                                    selectedInvoice.rows.map(
+                                      (lineItem: any, index: any) => (
+                                        <TableRow key={index + 1}>
+                                          <TableCell className="font-medium text-left">
+                                            {index + 1}
+                                          </TableCell>
+                                          <TableCell className="text-left">
+                                            {lineItem.name}
+                                          </TableCell>
+                                          <TableCell className="text-center">
+                                            {lineItem.quantity}
+                                          </TableCell>
+                                          <TableCell className="text-right">
+                                            {(
+                                              lineItem.price * lineItem.quantity
+                                            ).toFixed(2)}
+                                          </TableCell>
+                                        </TableRow>
+                                      ),
+                                    )}
+                                </TableBody>
+                                <TableFooter>
+                                  <TableRow>
+                                    <TableCell colSpan={3}>Total</TableCell>
+                                    <TableCell className="text-right">
+                                      {selectedInvoice &&
+                                        Number(
+                                          selectedInvoice.rows.reduce(
+                                            (
+                                              total: number,
+                                              item: {
+                                                price: any;
+                                                quantity: number;
+                                              },
+                                            ) =>
+                                              total +
+                                              Number(item.price) *
+                                                item.quantity,
+                                            0,
+                                          ),
+                                        ).toFixed(2)}
+                                    </TableCell>
+                                  </TableRow>
+                                </TableFooter>
+                              </Table>
+                              <br />
+                              Comments: {invoice[0].comment} <br />
+                              Status: {invoice[0].status}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter className="sm:justify-start">
+                            <DialogClose asChild>
+                              <Button type="button" variant="secondary">
+                                Close
+                              </Button>
+                            </DialogClose>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    ))}
+                  </TableBody>
+                </Table>
               </table>
             </div>
           </div>
