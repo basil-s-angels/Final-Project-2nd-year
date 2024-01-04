@@ -54,6 +54,7 @@ export default function EmployeeDashboard() {
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee`)
@@ -140,25 +141,22 @@ export default function EmployeeDashboard() {
     groupedData[id - 1].push(item);
   });
 
-  let filteredData: any[] = [];
-
-  if (selectedYear && selectedMonth && selectedDay) {
-    // Filter the data based on the selected year, month, and day
-    filteredData = groupedData.filter((item) => {
-      const date = new Date(item[0].created_at);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1; // Months are zero-based in JS
-      const day = date.getDate();
-      const yearMatches = year.toString() === selectedYear;
-      const monthMatches = month.toString() === selectedMonth;
-      const dayMatches = day.toString() === selectedDay;
-      return yearMatches && monthMatches && dayMatches;
-    });
-  } else {
-    // Handle the case when not all three (year, month, and day) are selected
-    // Set filteredData to the entire data in that case
-    filteredData = groupedData;
-  }
+  useEffect(() => {
+    if (selectedYear && selectedMonth && selectedDay) {
+      // Filter the data based on the selected year, month, and day
+      const filtered = groupedData.filter((item) => {
+        const date = new Date(item[0].created_at);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // Months are zero-based in JS
+        const day = date.getDate();
+        const yearMatches = year.toString() === selectedYear;
+        const monthMatches = month.toString() === selectedMonth;
+        const dayMatches = day.toString() === selectedDay;
+        return yearMatches && monthMatches && dayMatches;
+      });
+      setFilteredData(filtered);
+    }
+  }, [selectedYear, selectedMonth, selectedDay]); // Removed groupedData from the dependency array
 
   return (
     <div className="min-h-screen p-4 md:p-8 bg-gray-900 text-white">
@@ -181,12 +179,23 @@ export default function EmployeeDashboard() {
             </h2>
             Filter Orders
             <div className="flex justify-center space-x-4">
+              <Button
+                onClick={() => {
+                  setSelectedYear(null);
+                  setSelectedMonth(null);
+                  setSelectedDay(null);
+                  setFilteredData(groupedData); // Set filteredData to groupedData when "All" button is clicked
+                }}
+                className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+              >
+                All
+              </Button>
               <Popover>
                 <PopoverTrigger
                   className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
                 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
                 >
-                  {selectedYear || "Year"}
+                  {selectedYear ? `Year: ${selectedYear}` : "Year"}
                 </PopoverTrigger>
                 <PopoverContent>
                   {[2020, 2021, 2022, 2023, 2024].map((year, index) => (
@@ -206,8 +215,7 @@ export default function EmployeeDashboard() {
                   className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
                 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
                 >
-                  {" "}
-                  Month
+                  {selectedMonth ? `Month: ${selectedMonth}` : "Month"}
                 </PopoverTrigger>
                 <PopoverContent className="max-h-60 overflow-auto">
                   {[
@@ -240,8 +248,7 @@ export default function EmployeeDashboard() {
                   className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
                 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
                 >
-                  {" "}
-                  Day
+                  {selectedDay ? `Day: ${selectedDay}` : "Day"}
                 </PopoverTrigger>
                 <PopoverContent className="max-h-60 overflow-auto">
                   {Array.from({ length: 31 }, (_, i) =>
