@@ -16,6 +16,10 @@ export interface LineItem {
   quantity: number;
   price: string;
   date_format: string;
+  total: number;
+  this_month_revenue: number;
+  last_month_revenue: number;
+  avg: number;
 }
 
 export interface OrderCardProps {

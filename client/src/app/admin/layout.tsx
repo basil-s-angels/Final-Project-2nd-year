@@ -88,9 +88,17 @@ export default function AdminLayout({
               </SheetDescription>
             </SheetHeader>
             <SheetFooter>
-              <SheetClose asChild>
-                <Logout setOpen={setOpen} />
-              </SheetClose>
+              {pathname !== "/admin/login" && pathname !== "/admin/signup" ? (
+                <SheetClose asChild>
+                  <Logout setOpen={setOpen} />
+                </SheetClose>
+              ) : (
+                <SheetClose asChild>
+                  <Button disabled variant={"destructive"}>
+                    Log out
+                  </Button>
+                </SheetClose>
+              )}
             </SheetFooter>
           </SheetContent>
         </Sheet>

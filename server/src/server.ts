@@ -15,6 +15,9 @@ import invoiceIDQuery from "./routes/invoices/queries/idQuery";
 import invoiceTableQuery from "./routes/invoices/queries/tableNumQuery";
 import invoiceFoodQuery from "./routes/invoices/queries/foodNameQuery";
 import overallBestSellers from "./routes/dashboard/bestSellers";
+import overallWorstSellers from "./routes/dashboard/worstSellers";
+import averageDaily from "./routes/dashboard/averageDaily";
+import monthlyComparison from "./routes/dashboard/monthlyComparison";
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -48,7 +51,10 @@ async function serverStart() {
     .use("/invoices/invoiceID", invoiceIDQuery)
     .use("/invoices/tableNum", invoiceTableQuery)
     .use("/invoices/foodName", invoiceFoodQuery)
-    .use("/menu/overall-best", overallBestSellers);
+    .use("/menu/overall-best", overallBestSellers)
+    .use("/menu/overall-worst", overallWorstSellers)
+    .use("/menu/monthly-comparison", monthlyComparison)
+    .use("/menu/daily-average", averageDaily);
 
   app.listen(port, () => {
     console.log(`Listening on http://${host}:${port}`);

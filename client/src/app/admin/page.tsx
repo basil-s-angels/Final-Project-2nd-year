@@ -10,11 +10,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { LineItem } from "@/lib/types";
 
 export default function AdminHome() {
-  const [overallBest, setOverallBest] = useState<Array<any>>([]);
+  const [overallBest, setOverallBest] = useState<Array<LineItem>>([]);
+  const [overallWorst, setOverallWorst] = useState<Array<LineItem>>([]);
+  const [dailyAvg, setDailyAvg] = useState<Array<LineItem>>([]);
+  const [monthlyComparison, setMonthlyComparison] = useState<Array<LineItem>>(
+    [],
+  );
 
-  async function fetchOverallBest() {
+  async function fetchData() {
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/menu/overall-best`, {
       method: "GET",
       headers: {
@@ -26,13 +32,52 @@ export default function AdminHome() {
         setOverallBest(results);
       })
       .catch((error) => console.error(error));
+
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/menu/overall-worst`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((results) => {
+        setOverallWorst(results);
+      })
+      .catch((error) => console.error(error));
+
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/menu/daily-average`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((results) => {
+        setDailyAvg(results);
+      })
+      .catch((error) => console.error(error));
+
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/menu/monthly-comparison`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((results) => {
+        setMonthlyComparison(results);
+      })
+      .catch((error) => console.error(error));
   }
 
   useEffect(() => {
-    fetchOverallBest();
+    fetchData();
   }, []);
 
   console.log(overallBest, "best seller?");
+  console.log(overallWorst, "worst seller?");
+  console.log(dailyAvg, "daily avg");
+  console.log(monthlyComparison, "monthly");
 
   return (
     <>
@@ -44,7 +89,7 @@ export default function AdminHome() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Total Revenue
+                      Monthly Comparison
                     </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -60,16 +105,27 @@ export default function AdminHome() {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">₱45,231.89</div>
+                    <div className="text-2xl font-bold">
+                      ₱
+                      {Number(
+                        monthlyComparison[0] &&
+                          monthlyComparison[0].this_month_revenue,
+                      ).toFixed(2)}
+                    </div>
                     <p className="text-xs text-muted-foreground">
-                      +20.1% from last month
+                      Compared to ₱
+                      {Number(
+                        monthlyComparison[0] &&
+                          monthlyComparison[0].last_month_revenue,
+                      ).toFixed(2)}{" "}
+                      last month
                     </p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Subscriptions
+                      Average Daily Orders
                     </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -87,9 +143,11 @@ export default function AdminHome() {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">+2350</div>
+                    <div className="text-2xl font-bold">
+                      {Number(dailyAvg[0] && dailyAvg[0].avg).toFixed(2)}
+                    </div>
                     <p className="text-xs text-muted-foreground">
-                      +180.1% from last month
+                      thats not alot sad
                     </p>
                   </CardContent>
                 </Card>
@@ -152,7 +210,7 @@ export default function AdminHome() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {overallBest.map((item: any[], index: number) => (
+                    {overallBest.map((item: LineItem, index: number) => (
                       <div key={index}>
                         <div>
                           {index + 1}. {item.name}, Ordered {item.total} times
@@ -163,12 +221,20 @@ export default function AdminHome() {
                 </Card>
                 <Card className="col-span-3">
                   <CardHeader>
-                    <CardTitle>Recent Sales</CardTitle>
+                    <CardTitle>Overall Worst Sellers</CardTitle>
                     <CardDescription>
-                      You made 265 sales this month.
+                      Products that aren&apos;t performing well.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>sales hello</CardContent>
+                  <CardContent>
+                    {overallWorst.map((item: LineItem, index: number) => (
+                      <div key={index}>
+                        <div>
+                          {index + 1}. {item.name}, Ordered {item.total} times
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
                 </Card>
               </div>
             </TabsContent>
