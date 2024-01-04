@@ -11,7 +11,6 @@ on:
 defaults:
   run:
     shell: bash
-    working-directory: ./client
 jobs:
   Deploy-Production:
     runs-on: ubuntu-latest
@@ -20,8 +19,8 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
       - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: cd client && vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       - name: Build Project Artifacts
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: cd client && vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: cd client && vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
