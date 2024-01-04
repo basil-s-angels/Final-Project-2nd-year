@@ -11,11 +11,11 @@ export interface LineItem {
   created_at: string;
   status: string;
   comment: string;
-  table_id: number;
+  table_num: number;
   name: string;
   quantity: number;
   price: string;
-  code: string;
+  date_format: string;
 }
 
 export interface OrderCardProps {
