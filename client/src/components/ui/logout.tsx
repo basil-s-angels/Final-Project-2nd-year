@@ -4,38 +4,18 @@ import React from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "./button";
+import userLogout from "@/lib/userLogout";
 
-export default function Logout() {
+export default function Logout({ setOpen }: any) {
   const router = useRouter();
-
-  async function userLogout() {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/user`,
-        {
-          method: "DELETE",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log(result.message);
-        router.push("/admin/login");
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   return (
     <Button
       variant={"destructive"}
       onClick={() => {
         userLogout();
+        setOpen(false);
+        router.push("/admin/login");
       }}
     >
       Log out

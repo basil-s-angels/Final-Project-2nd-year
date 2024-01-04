@@ -1,13 +1,7 @@
 "use client";
 
-// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from "react";
 
-import { UserJWT } from "@/lib/types";
-import fetchUser from "@/lib/getUser";
-import Logout from "@/components/ui/logout";
-
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,52 +9,36 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 
 export default function AdminHome() {
-  let [user, setUser] = useState<UserJWT | null>(null);
+  const [overallBest, setOverallBest] = useState<Array<any>>([]);
+
+  async function fetchOverallBest() {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/menu/overall-best`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((results) => {
+        setOverallBest(results);
+      })
+      .catch((error) => console.error(error));
+  }
 
   useEffect(() => {
-    fetchUser()
-      .then((user) => {
-        setUser(user);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    fetchOverallBest();
   }, []);
+
+  console.log(overallBest, "best seller?");
 
   return (
     <>
       <div className="flex-col md:flex">
-        <div className="border-b">
-          <div className="flex h-16 items-center px-4">
-            hello admin {user && user.firstName + " " + user.lastName}
-            <div className="ml-auto flex items-center space-x-4">
-              <Logout />
-            </div>
-          </div>
-        </div>
         <div className="flex-1 space-y-4 p-8 pt-6">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-            <div className="flex items-center space-x-2">
-              <Button>Download</Button>
-            </div>
-          </div>
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="analytics" disabled>
-                Analytics
-              </TabsTrigger>
-              <TabsTrigger value="reports" disabled>
-                Reports
-              </TabsTrigger>
-              <TabsTrigger value="notifications" disabled>
-                Notifications
-              </TabsTrigger>
-            </TabsList>
             <TabsContent value="overview" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
@@ -82,7 +60,7 @@ export default function AdminHome() {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">$45,231.89</div>
+                    <div className="text-2xl font-bold">₱45,231.89</div>
                     <p className="text-xs text-muted-foreground">
                       +20.1% from last month
                     </p>
@@ -168,9 +146,20 @@ export default function AdminHome() {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">
                   <CardHeader>
-                    <CardTitle>Overview</CardTitle>
+                    <CardTitle>Overall Best Sellers</CardTitle>
+                    <CardDescription>
+                      Best selling products ever sold.
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="pl-2">card hello</CardContent>
+                  <CardContent>
+                    {overallBest.map((item: any[], index: number) => (
+                      <div key={index}>
+                        <div>
+                          {index + 1}. {item.name}, Ordered {item.total} times
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
                 </Card>
                 <Card className="col-span-3">
                   <CardHeader>

@@ -71,7 +71,6 @@ export default function OrderBoard() {
   return (
     <main className="flex flex-col h-max md:h-screen w-screen md:overflow-x-scroll">
       <nav className="flex flex-col items-center text-lg text-center overflow-hidden h-[85px] md:h-[100px] px-3">
-        <p className="font-bold uppercase">Order Board</p>
         <OrderSearch setSearchResult={setSearchResult} />
       </nav>
       <div className="w-screen flex flex-col m-auto md:flex-row md:gap-4 md:overflow-x-scroll gap-5 h-screen pt-4 pb-8 px-3">
