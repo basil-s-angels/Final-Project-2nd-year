@@ -259,7 +259,7 @@ export default function FoodMenuPage({
               BASKET
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[80%]">
+          <DialogContent className="sm:max-w-[80%] mt-7">
             <Ordercart orders={orders} />
           </DialogContent>
         </Dialog>
