@@ -141,7 +141,6 @@ export default function EmployeeDashboard() {
   };
 
   let groupedData: any[] = [];
-
   groupData.forEach((item) => {
     let id = item.id;
 
