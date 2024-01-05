@@ -32,7 +32,10 @@ import {
 import { SetStateAction, useState } from "react";
 import { OrderCardProps } from "@/lib/types";
 
-export default function OrderCard({ lineItems }: OrderCardProps) {
+export default function OrderCard({
+  lineItems,
+  onRemoveOrder,
+}: OrderCardProps & { onRemoveOrder: any }) {
   const [position, setPosition] = useState("");
 
   async function handleStatusChange(newStatus: SetStateAction<string>) {
@@ -73,6 +76,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
 
     if (response.ok) {
       const result = await response.json();
+      onRemoveOrder(invoiceId);
       console.log(result.message);
     } else {
       console.error("HTTP error:", response.statusText);
@@ -120,7 +124,7 @@ export default function OrderCard({ lineItems }: OrderCardProps) {
       <CardContent>
         <p className="text-sm">Table number: {lineItems[0].table_num}</p>
         <p className="text-sm">Created at: {lineItems[0].date_format}</p>
-        <p className="text-sm">Comment: {lineItems[0].comment}</p>
+        <p className="text-sm break-all">Comment: {lineItems[0].comment}</p>
         <div className="flex justify-center mt-2 mb-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
