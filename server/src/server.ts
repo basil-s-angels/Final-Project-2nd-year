@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
@@ -14,6 +14,8 @@ import invoices from "./routes/invoices/currentOrders";
 import invoiceIDQuery from "./routes/invoices/queries/idQuery";
 import invoiceTableQuery from "./routes/invoices/queries/tableNumQuery";
 import invoiceFoodQuery from "./routes/invoices/queries/foodNameQuery";
+import getMenu from "./routes/menu-page/getMenu";
+import topSellers from "./routes/menu-page/topSellers";
 import tableStatus from "./routes/status-page/status";
 
 export const pool = new Pool({
@@ -48,7 +50,9 @@ async function serverStart() {
     .use("/invoices/invoiceID", invoiceIDQuery)
     .use("/invoices/tableNum", invoiceTableQuery)
     .use("/invoices/foodName", invoiceFoodQuery)
-    .use("/status", tableStatus);
+    .use("/status", tableStatus)
+    .use("/menu-page", getMenu)
+    .use("/top-sellers", topSellers);
 
   app.listen(port, () => {
     console.log(`Listening on http://${host}:${port}`);
