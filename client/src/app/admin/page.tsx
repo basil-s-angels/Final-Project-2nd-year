@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 export default function AdminHome() {
   const [overallBest, setOverallBest] = useState<Array<LineItem>>([]);
   const [overallWorst, setOverallWorst] = useState<Array<LineItem>>([]);
-  const [dailyAvg, setDailyAvg] = useState<Array<LineItem>>([]);
+  const [dailyOrders, setDailyOrders] = useState<Array<LineItem>>([]);
   const [monthlyComparison, setMonthlyComparison] = useState<Array<LineItem>>(
     [],
   );
@@ -26,7 +26,7 @@ export default function AdminHome() {
     Promise.all([
       fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/statistics/overall-best`),
       fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/statistics/overall-worst`),
-      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/statistics/daily-average`),
+      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/statistics/daily-orders`),
       fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/statistics/monthly-comparison`,
       ),
@@ -37,13 +37,13 @@ export default function AdminHome() {
         ([
           overallBest,
           overallWorst,
-          dailyAvg,
+          dailyOrders,
           monthlyComparison,
           employees,
         ]) => {
           setOverallBest(overallBest);
           setOverallWorst(overallWorst);
-          setDailyAvg(dailyAvg);
+          setDailyOrders(dailyOrders);
           setMonthlyComparison(monthlyComparison);
           setEmployees(employees);
         },
@@ -53,7 +53,7 @@ export default function AdminHome() {
 
   console.log(overallBest, "best seller?");
   console.log(overallWorst, "worst seller?");
-  console.log(dailyAvg, "daily avg");
+  console.log(dailyOrders, "daily avg");
   console.log(monthlyComparison, "monthly");
   console.log(employees, "emps");
 
@@ -63,7 +63,7 @@ export default function AdminHome() {
         <div className="flex-1 space-y-4 p-8 pt-6">
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsContent value="overview" className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
@@ -105,7 +105,7 @@ export default function AdminHome() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Average Daily Orders
+                      Total Orders Today
                     </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -124,67 +124,18 @@ export default function AdminHome() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {Number(dailyAvg[0] && dailyAvg[0].avg).toFixed(2)}
+                      {dailyOrders[0] && dailyOrders[0].invoices_today}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      thats not alot sad
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      not sure yet
-                    </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <rect width="20" height="14" x="2" y="5" rx="2" />
-                      <path d="M2 10h20" />
-                    </svg>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">+12,234</div>
-                    <p className="text-xs text-muted-foreground">
-                      +19% from last month
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Active Now
-                    </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                    </svg>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">+573</div>
-                    <p className="text-xs text-muted-foreground">
-                      +201 since last hour
+                      Compared to{" "}
+                      {dailyOrders[0] && dailyOrders[0].invoices_yesterday}{" "}
+                      orders from yesterday
                     </p>
                   </CardContent>
                 </Card>
               </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
+              <div className="grid gap-4 md:grid-cols-7">
+                <Card className="md:col-span-4">
                   <CardHeader>
                     <CardTitle>Overall Best Sellers</CardTitle>
                     <CardDescription>
@@ -201,7 +152,7 @@ export default function AdminHome() {
                     ))}
                   </CardContent>
                 </Card>
-                <Card className="col-span-3">
+                <Card className="md:col-span-3 ">
                   <CardHeader>
                     <CardTitle>Overall Worst Sellers</CardTitle>
                     <CardDescription>

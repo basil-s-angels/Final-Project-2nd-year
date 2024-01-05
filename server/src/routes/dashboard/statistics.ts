@@ -53,18 +53,24 @@ router.get("/overall-worst", async (request: Request, response: Response) => {
   }
 });
 
-router.get("/daily-average", async (request: Request, response: Response) => {
+router.get("/daily-orders", async (request: Request, response: Response) => {
   try {
     const client = await pool.connect();
     const { rows } = await client.query(
       `
-      SELECT AVG(daily_orders) 
-      FROM (
-        SELECT DATE(created_at) AS order_date, COUNT(*) AS daily_orders
+      SELECT
+      (
+        SELECT COUNT(*)
         FROM invoices
-        WHERE status = 'completed'
-        GROUP BY order_date
-      ) AS subquery;
+        WHERE created_at >= CURRENT_DATE
+        AND created_at < CURRENT_DATE + INTERVAL '1 day'
+      ) AS invoices_today,
+      (
+        SELECT COUNT(*)
+        FROM invoices
+        WHERE created_at >= CURRENT_DATE - INTERVAL '1 day'
+        AND created_at < CURRENT_DATE
+      ) AS invoices_yesterday
       `,
     );
 
@@ -87,16 +93,20 @@ router.get(
       (
         SELECT SUM(foods.price * line_items.quantity)
         FROM line_items
-        INNER JOIN invoices ON line_items.invoice_id = invoices.id
-        INNER JOIN foods ON line_items.food_id = foods.id
+        INNER JOIN invoices
+        ON line_items.invoice_id = invoices.id
+        INNER JOIN foods
+        ON line_items.food_id = foods.id
         WHERE DATE(invoices.created_at) >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
-          AND DATE(invoices.created_at) < DATE_TRUNC('month', CURRENT_DATE)
+        AND DATE(invoices.created_at) < DATE_TRUNC('month', CURRENT_DATE)
       ) AS last_month_revenue,
       (
         SELECT SUM(foods.price * line_items.quantity)
         FROM line_items
-        INNER JOIN invoices ON line_items.invoice_id = invoices.id
-        INNER JOIN foods ON line_items.food_id = foods.id
+        INNER JOIN invoices
+        ON line_items.invoice_id = invoices.id
+        INNER JOIN foods
+        ON line_items.food_id = foods.id
         WHERE DATE(invoices.created_at) >= DATE_TRUNC('month', CURRENT_DATE)
       ) AS this_month_revenue;    
       `,

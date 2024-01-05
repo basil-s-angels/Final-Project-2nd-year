@@ -19,7 +19,8 @@ export interface LineItem {
   total: number;
   this_month_revenue: number;
   last_month_revenue: number;
-  avg: number;
+  invoices_today: number;
+  invoices_yesterday: number;
 }
 
 export interface OrderCardProps {
