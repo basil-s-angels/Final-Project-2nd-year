@@ -41,11 +41,6 @@ interface Invoice {
   status: string;
 }
 
-interface EmployeeData {
-  id: number;
-  name: string;
-}
-
 interface LineItem {
   name: string;
   quantity: number;
@@ -57,7 +52,6 @@ interface SelectedInvoice {
 }
 
 export default function EmployeeDashboard() {
-  const [employeeData, setEmployeeData] = useState<EmployeeData | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [groupData, setGroupData] = useState<any[]>([]);
   const [selectedInvoice, setSelectedInvoice] = useState<SelectedInvoice>();
@@ -71,7 +65,6 @@ export default function EmployeeDashboard() {
       .then((response) => response.json())
       .then((data) => {
         console.log(data, "from useeffect");
-        setEmployeeData(data);
         setInvoices(data);
         setGroupData(data);
       });
@@ -155,18 +148,19 @@ export default function EmployeeDashboard() {
       // Filter the data based on the selected year, month, and day
       const filtered = groupedData.filter((item) => {
         const date = new Date(item[0].created_at);
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1; // Months are zero-based in JS
-        const day = date.getDate();
-        const yearMatches = year.toString() === selectedYear;
-        const monthMatches = month.toString() === selectedMonth;
-        const dayMatches = day.toString() === selectedDay;
+        date.setUTCHours(0, 0, 0, 0);
+        const year = String(date.getUTCFullYear()).padStart(4, "0");
+        const month = String(date.getUTCMonth() + 1).padStart(2, "0"); // Months are zero-based in JS
+        const day = String(date.getUTCDate()).padStart(2, "0");
+        const yearMatches = year === selectedYear;
+        const monthMatches = month === selectedMonth;
+        const dayMatches = day === selectedDay;
         return yearMatches && monthMatches && dayMatches;
       });
       setFilteredData(filtered);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedYear, selectedMonth, selectedDay]); // Removed groupedData from the dependency array
+  }, [selectedYear, selectedMonth, selectedDay]);
 
   return (
     <div className="min-h-screen p-4 md:p-8 bg-gray-900 text-white">
@@ -174,13 +168,6 @@ export default function EmployeeDashboard() {
         <h1 className="text-2xl md:text-4xl font-bold text-center mb-4 md:mb-8">
           Employee Dashboard
         </h1>
-
-        <div className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4 md:gap-12">
-          <div className="bg-gray-700 p-4 rounded shadow">
-            <p className="text-lg font-semibold">Name: {employeeData?.name}</p>
-            <p className="text-lg">ID: {employeeData?.id}</p>
-          </div>
-        </div>
 
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-4 md:mb-8">
           <div className="flex-1">
