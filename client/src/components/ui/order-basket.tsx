@@ -1,5 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useState, useEffect } from "react";
+// import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 interface FoodItem {
   id: number;
@@ -14,6 +17,7 @@ type OrdercartProps = {
     name: string;
     quantity: number;
     price: number;
+    tableNum: number;
   }>;
 };
 
@@ -21,6 +25,7 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
   const [cartItems, setcartItems] = useState<FoodItem[]>([]);
   const [, setQuantities] = useState<number[]>([]);
   const [comment, setComment] = useState("");
+  // const router = useRouter()
 
   useEffect(() => {
     console.log(orders, "orders");
@@ -180,13 +185,17 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
                   onChange={(event) => setComment(event.target.value)}
                 />
               </div>
-              <button
+              <Button
                 className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg bg-blue-500 text-white-700 py-2 px-3 rounded-lg mt-4 w-full"
-                onClick={handleCheckout}
+                onClick={() => {
+                  // router.push(`${tableNum}/status`)
+                  handleCheckout();
+                }}
+                variant={"default"}
               >
                 {" "}
                 Place Order
-              </button>
+              </Button>
             </div>
           </div>
         </div>
