@@ -15,13 +15,15 @@ router.get("/:tableNum", async (request: Request, response: Response) => {
                 line_items.quantity,
                 foods.name,
                 invoices.table_num,
-                foods.price
+                foods.price,
+                invoices.comment
             FROM invoices
             INNER JOIN line_items
             ON invoices.id = line_items.invoice_id
             INNER JOIN foods
             ON foods.id = line_items.food_id
-            WHERE invoices.table_num = $1
+            WHERE invoices.table_num = $1 
+            AND invoices.status != 'completed'
             `,
       [tableNum],
     );
