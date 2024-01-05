@@ -1,29 +1,27 @@
-/* eslint-disable no-unused-vars */
 "use client";
-// import { Item } from "@radix-ui/react-select";
 import React, { useState, useEffect } from "react";
 
-interface CartItem {
+interface FoodItem {
   id: number;
   name: string;
-  price: number;
   quantity: number;
+  price: number;
 }
 
 type OrdercartProps = {
   orders: Array<{
     id: number;
-    itemName: string;
+    name: string;
     quantity: number;
     price: number;
   }>;
 };
 
 const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
-  const [cartItems, setcartItems] = useState<any[]>([]);
-  const [quantities, setQuantities] = useState<number[]>([]);
+  const [cartItems, setcartItems] = useState<FoodItem[]>([]);
+  const [, setQuantities] = useState<number[]>([]);
   const [comment, setComment] = useState("");
-  const [, updateState] = useState<number | null>(null);
+
   useEffect(() => {
     console.log(orders, "orders");
     setcartItems(orders);
@@ -44,7 +42,7 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
   const handleRemoveOrder = (id: number) => {
     setcartItems(
       cartItems
-        .map((item) => {
+        .map((item: FoodItem) => {
           if (item.id === id && item.quantity > 1) {
             return { ...item, quantity: item.quantity - 1 };
           } else if (item.id === id && item.quantity === 1) {
@@ -53,14 +51,14 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
             return item;
           }
         })
-        .filter(Boolean),
+        .filter((item: FoodItem | null): item is FoodItem => item !== null),
     );
   };
 
   const handleAddOrder = (id: number) => {
     setcartItems(
       cartItems.map((item) => {
-        if (item.id === id && item.quantity >= 1) {
+        if (item.id === id) {
           return { ...item, quantity: item.quantity + 1 };
         } else {
           return item;
@@ -126,7 +124,7 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
                       <td className="py-4">
                         <div className="flex-items-center">
                           <span className="min-[320px]:text-xs max-[600px]:ml-0 md:text-lg text-center text-blue-800 font-semibold ml-2">
-                            {order.itemName}
+                            {order.name}
                           </span>
                         </div>
                       </td>
