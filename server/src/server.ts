@@ -18,6 +18,7 @@ import getMenu from "./routes/menu-page/getMenu";
 import topSellers from "./routes/menu-page/topSellers";
 import tableStatus from "./routes/status-page/status";
 import allOrders from "./routes/done-orders/allOrders";
+import orderBasket from "./routes/basket/order-basket";
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -53,6 +54,7 @@ async function serverStart() {
     .use("/invoices/foodName", invoiceFoodQuery)
     .use("/status", tableStatus)
     .use("/admin/employee", allOrders)
+    .use("/orders", orderBasket)
     .use("/menu-page", getMenu)
     .use("/top-sellers", topSellers);
 
