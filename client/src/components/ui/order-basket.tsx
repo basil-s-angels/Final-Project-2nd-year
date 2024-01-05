@@ -2,7 +2,6 @@
 "use client";
 // import { Item } from "@radix-ui/react-select";
 import React, { useState, useEffect } from "react";
-import { Client } from "pg";
 
 interface CartItem {
   id: number;
@@ -17,39 +16,14 @@ type OrdercartProps = {
 
 const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
   const [cartItems, setcartItems] = useState<any[]>([]);
-  const [quantities, setQuantities] = useState(Array(cartItems.length).fill(1));
+  const [quantities, setQuantities] = useState<number[]>([]);
   const [comment, setComment] = useState("");
 
   useEffect(() => {
     console.log(orders, "orders");
     setcartItems(orders);
-  }, []);
-
-  // const addQuantity = (quantity: number) => {
-  //   setQuantities((prevQuantities) => {
-  //     const newQuantities = [...prevQuantities];
-  //     newQuantities[quantity] += 1;
-  //     return newQuantities;
-  //   });
-  // };
-
-  // const handleAddtoCart = (items: Cartitem) =>{
-  //   setcartItems([...cartItems, items])
-  // }
-
-  const handleRemoveFromCart = (id: number) => {
-    setcartItems(cartItems.filter((item) => item.id != id));
-  };
-
-  // const minusQuantity = (index: number): undefined => {
-  //   if (quantities[index]> 1) {
-  //     setQuantities((prevQuantities) => {
-  //       const newQuantities = [...prevQuantities];
-  //       newQuantities[index] -= 1;
-  //       return newQuantities;
-  //     });
-  //   }
-  // };
+    setQuantities(orders.map(() => 1));
+  }, [orders]);
 
   const calculateSubtotal = () => {
     return cartItems.reduce(
@@ -61,13 +35,12 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
   const handleCheckout = async () => {
     console.log(cartItems, "cartitems");
     console.log(comment);
-    alert("Thank you for choosing us!");
 
     if (comment.trim() === "") {
       setComment("N/A");
     }
 
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/order`, {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -79,12 +52,14 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
     })
       .then((response) => response.json())
       .then((result) => console.log(result, "shshs"));
+
+    alert("Thank you for choosing us!");
   };
 
   return (
     <div className=" min-[320px]:py-4 max-[600px] h-screen py-8">
       <div className="container mx-auto px-4">
-        <h1 className="min-[320px]:text-center max-[600px]:text-lg text-white-500 font-semibold mb-4">
+        <h1 className="min-[320px]:text-center max-[600px]:text-lg lg:text-2xl text-white-500 font-semibold mb-4">
           {" "}
           ORDER SUMMARY
         </h1>
@@ -94,15 +69,15 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
               <table className="w-full">
                 <thead>
                   <tr>
-                    <th className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg text-left text-blue-600 font-semibold pl-5">
+                    <th className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg lg:text-xl text-left text-blue-600 font-semibold pl-5">
                       {" "}
                       Food Name
                     </th>
-                    <th className="min-[320px]:text-xs max-[600px]:pr-2 md:text-lg text-left text-blue-600 font-semibold">
+                    <th className="min-[320px]:text-xs max-[600px]:pr-2 md:text-lg  lg:text-xl text-left text-blue-600 font-semibold">
                       {" "}
                       Quantity
                     </th>
-                    <th className="min-[320px]:text-xs max-[600px] md:text-lg text-left text-blue-600 font-semibold">
+                    <th className="min-[320px]:text-xs max-[600px] md:text-lg lg:text-lg text-left text-blue-600 font-semibold">
                       {" "}
                       Total
                     </th>
@@ -121,21 +96,9 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
                       </td>
                       <td className="py-4">
                         <div className="flex-items-center">
-                          {/* <button
-                            className="md:border rounded-md md:py-2 md:px-4 md:mr-2 ml-2 text-gray-700 "
-                            onClick={minusQuantity(index)}
-                          >
-                            -
-                          </button> */}
                           <span className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg text-gray-700 w-9 mx-2 md:pl-6">
                             {order.quantity}
                           </span>
-                          {/* <button
-                            className="md:border rounded-md md:py-2 md:px-4 md:ml-2 text-gray-700 "
-                            onClick={() => addQuantity(index)}
-                          >
-                            +
-                          </button> */}
                         </div>
                       </td>
                       <td className="min-[320px]:text-xs max-[600px] md:text-lg text-left text-sm text-gray-800 py-4">
@@ -166,9 +129,8 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
                   {" "}
                   Special Instructions
                 </h2>
-                <input
-                  type="textarea"
-                  className="break-all text-gray-600 w-full h-20 px-3 border-gray-600"
+                <textarea
+                  className="text-gray-600 w-full h-20 px-3 border-gray-600"
                   placeholder="Insert Special Message here"
                   value={comment}
                   onChange={(event) => setComment(event.target.value)}
