@@ -18,6 +18,7 @@ import overallBestSellers from "./routes/dashboard/bestSellers";
 import overallWorstSellers from "./routes/dashboard/worstSellers";
 import averageDaily from "./routes/dashboard/averageDaily";
 import monthlyComparison from "./routes/dashboard/monthlyComparison";
+import employees from "./routes/dashboard/employees";
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -54,7 +55,8 @@ async function serverStart() {
     .use("/menu/overall-best", overallBestSellers)
     .use("/menu/overall-worst", overallWorstSellers)
     .use("/menu/monthly-comparison", monthlyComparison)
-    .use("/menu/daily-average", averageDaily);
+    .use("/menu/daily-average", averageDaily)
+    .use("/all-employees", employees);
 
   app.listen(port, () => {
     console.log(`Listening on http://${host}:${port}`);

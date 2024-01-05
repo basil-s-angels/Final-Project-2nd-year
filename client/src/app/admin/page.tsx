@@ -19,6 +19,7 @@ export default function AdminHome() {
   const [monthlyComparison, setMonthlyComparison] = useState<Array<LineItem>>(
     [],
   );
+  const [employees, setEmployees] = useState([]);
 
   async function fetchData() {
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/menu/overall-best`, {
@@ -68,6 +69,18 @@ export default function AdminHome() {
         setMonthlyComparison(results);
       })
       .catch((error) => console.error(error));
+
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/all-employees`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((results) => {
+        setEmployees(results);
+      })
+      .catch((error) => console.error(error));
   }
 
   useEffect(() => {
@@ -78,6 +91,7 @@ export default function AdminHome() {
   console.log(overallWorst, "worst seller?");
   console.log(dailyAvg, "daily avg");
   console.log(monthlyComparison, "monthly");
+  console.log(employees, "emps");
 
   return (
     <>
@@ -109,7 +123,9 @@ export default function AdminHome() {
                       ₱
                       {Number(
                         monthlyComparison[0] &&
-                          monthlyComparison[0].this_month_revenue,
+                          monthlyComparison[0].this_month_revenue.toLocaleString(
+                            "en-US",
+                          ),
                       ).toFixed(2)}
                     </div>
                     <p className="text-xs text-muted-foreground">
@@ -233,6 +249,23 @@ export default function AdminHome() {
                       <div key={index}>
                         <div>
                           {index + 1}. {item.name}, Ordered {item.total} times
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+              <div>
+                <Card className="col-span-3">
+                  <CardHeader>
+                    <CardTitle className="text-center">Employees</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {employees.map((item: any, index: number) => (
+                      <div key={index}>
+                        <div>
+                          {index + 1}. {item.first_name} {item.last_name} (
+                          {item.email})
                         </div>
                       </div>
                     ))}
