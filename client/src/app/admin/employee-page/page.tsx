@@ -46,11 +46,21 @@ interface EmployeeData {
   name: string;
 }
 
+interface LineItem {
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+interface SelectedInvoice {
+  rows: LineItem[];
+}
+
 export default function EmployeeDashboard() {
   const [employeeData, setEmployeeData] = useState<EmployeeData | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [groupData, setGroupData] = useState<any[]>([]);
-  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<SelectedInvoice>();
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
@@ -156,6 +166,7 @@ export default function EmployeeDashboard() {
       });
       setFilteredData(filtered);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedYear, selectedMonth, selectedDay]); // Removed groupedData from the dependency array
 
   return (
@@ -177,14 +188,16 @@ export default function EmployeeDashboard() {
             <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">
               Done Orders
             </h2>
-            Filter Orders
+            <p className="flex justify-center space-x-4 gap-4 mb-4 md:mb-4">
+              Filter Done Orders
+            </p>
             <div className="flex justify-center space-x-4">
               <Button
                 onClick={() => {
                   setSelectedYear(null);
                   setSelectedMonth(null);
                   setSelectedDay(null);
-                  setFilteredData(groupedData); // Set filteredData to groupedData when "All" button is clicked
+                  setFilteredData(groupedData); // Set filteredData to groupedData when All button is clicked
                 }}
                 className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
               >
@@ -272,56 +285,57 @@ export default function EmployeeDashboard() {
               </p>
             </div>
             {/* Display Done Orders table */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-gray-700 rounded-lg shadow overflow-hidden">
-                <Table>
+            <div className="flex justify-center">
+              <div className="overflow-x-auto">
+                <Table className="mx-auto bg-gray-700 rounded-lg shadow overflow-hidden table-fixed">
                   <TableCaption>A list of your recent invoices.</TableCaption>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead className="py-2 px-4 md:py-3 md:px-6 text-left">
-                        Invoice No.
+                    <TableRow className="grid grid-cols-3">
+                      <TableHead className="w-full py-3 px-4 md:py-3 md:px-6 text-center">
+                        Invoice No:
                       </TableHead>
-                      <TableHead className="py-2 px-4 md:py-3 md:px-6 text-center">
-                        Created at
+                      <TableHead className="w-full py-3 px-4 md:py-3 md:px-6 text-center">
+                        Created at:
                       </TableHead>
-                      <TableHead className="py-2 px-4 md:py-3 md:px-6 text-right">
-                        Amount
+                      <TableHead className="w-full py-3 px-4 md:py-3 md:px-6 text-center">
+                        Amount:
                       </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredData.map((invoice: any, index) => (
+                    {filteredData.map((invoice, index) => (
                       <Dialog key={index}>
                         <DialogTrigger asChild>
-                          <div>
+                          <div className="flex flex-col items-center">
                             <TableRow
-                              className="py-2 px-4 md:py-3 md:px-6 text-left hover:bg-gray-500 cursor-pointer"
+                              className="grid grid-cols-3 w-full"
                               onClick={async () => {
                                 console.log("Clicked Invoice:", invoice[0]);
                                 await handleClick(invoice[0]?.id);
                               }}
                             >
-                              <TableCell>{invoice[0]?.id}</TableCell>
-                              <TableCell className="py-2 px-4 md:py-3 md:px-6 text-center">
-                                {invoice[0]?.created_at}
-                              </TableCell>
-                              <TableCell className="py-2 px-4 md:py-3 md:px-6 text-right">
+                              <TableHead className="w-full py-4 px-4 md:py-4 md:px-6 text-center text-white">
+                                {invoice[0]?.id}
+                              </TableHead>
+                              <TableHead className="w-full py-4 px-4 md:py-4 md:px-6 text-center text-white">
+                                {new Date(
+                                  invoice[0]?.created_at,
+                                ).toLocaleDateString()}
+                              </TableHead>
+                              <TableHead className="w-full py-4 px-4 md:py-4 md:px-6 text-center text-white">
                                 P
                                 {Number(
                                   invoice.reduce(
                                     (
                                       total: number,
-                                      item: {
-                                        price: any;
-                                        quantity: number;
-                                      },
+                                      item: { price: number; quantity: number },
                                     ) =>
                                       total +
                                       Number(item.price) * item.quantity,
                                     0,
                                   ),
                                 ).toFixed(2)}
-                              </TableCell>
+                              </TableHead>
                             </TableRow>
                           </div>
                         </DialogTrigger>
@@ -332,16 +346,16 @@ export default function EmployeeDashboard() {
                               <Table>
                                 <TableHeader>
                                   <TableRow>
-                                    <TableHead className="w-[100px] text-left">
+                                    <TableHead className="w-[100px] text-center">
                                       Num
                                     </TableHead>
-                                    <TableHead className="text-left">
+                                    <TableHead className="text-center">
                                       Food Name
                                     </TableHead>
                                     <TableHead className="text-center">
                                       Quantity
                                     </TableHead>
-                                    <TableHead className="text-right">
+                                    <TableHead className="text-center">
                                       Price
                                     </TableHead>
                                   </TableRow>
@@ -349,18 +363,19 @@ export default function EmployeeDashboard() {
                                 <TableBody>
                                   {selectedInvoice &&
                                     selectedInvoice.rows.map(
-                                      (lineItem: any, index: any) => (
+                                      (lineItem: LineItem, index: number) => (
                                         <TableRow key={index + 1}>
-                                          <TableCell className="font-medium text-left">
+                                          <TableCell className="font-medium text-center text-white">
                                             {index + 1}
                                           </TableCell>
-                                          <TableCell className="text-left">
+                                          <TableCell className="text-center text-white">
                                             {lineItem.name}
                                           </TableCell>
-                                          <TableCell className="text-center">
+                                          <TableCell className="text-center text-white">
                                             {lineItem.quantity}
                                           </TableCell>
-                                          <TableCell className="text-right">
+                                          <TableCell className="text-center text-white">
+                                            P
                                             {(
                                               lineItem.price * lineItem.quantity
                                             ).toFixed(2)}
@@ -371,15 +386,21 @@ export default function EmployeeDashboard() {
                                 </TableBody>
                                 <TableFooter>
                                   <TableRow>
-                                    <TableCell colSpan={3}>Total</TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell
+                                      colSpan={3}
+                                      className="text-center"
+                                    >
+                                      Total
+                                    </TableCell>
+                                    <TableCell className="text-center text-white">
+                                      P
                                       {selectedInvoice &&
                                         Number(
                                           selectedInvoice.rows.reduce(
                                             (
                                               total: number,
                                               item: {
-                                                price: any;
+                                                price: number;
                                                 quantity: number;
                                               },
                                             ) =>
@@ -410,7 +431,7 @@ export default function EmployeeDashboard() {
                     ))}
                   </TableBody>
                 </Table>
-              </table>
+              </div>
             </div>
           </div>
         </div>
