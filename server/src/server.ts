@@ -14,6 +14,7 @@ import invoices from "./routes/invoices/currentOrders";
 import invoiceIDQuery from "./routes/invoices/queries/idQuery";
 import invoiceTableQuery from "./routes/invoices/queries/tableNumQuery";
 import invoiceFoodQuery from "./routes/invoices/queries/foodNameQuery";
+import tableStatus from "./routes/status-page/status";
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -46,7 +47,8 @@ async function serverStart() {
     .use("/invoices", invoices)
     .use("/invoices/invoiceID", invoiceIDQuery)
     .use("/invoices/tableNum", invoiceTableQuery)
-    .use("/invoices/foodName", invoiceFoodQuery);
+    .use("/invoices/foodName", invoiceFoodQuery)
+    .use("/status", tableStatus);
 
   app.listen(port, () => {
     console.log(`Listening on http://${host}:${port}`);
