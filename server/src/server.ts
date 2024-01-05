@@ -19,6 +19,7 @@ import overallWorstSellers from "./routes/dashboard/worstSellers";
 import averageDaily from "./routes/dashboard/averageDaily";
 import monthlyComparison from "./routes/dashboard/monthlyComparison";
 import employees from "./routes/dashboard/employees";
+import tableStatus from "./routes/status-page/status";
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -52,6 +53,7 @@ async function serverStart() {
     .use("/invoices/invoiceID", invoiceIDQuery)
     .use("/invoices/tableNum", invoiceTableQuery)
     .use("/invoices/foodName", invoiceFoodQuery)
+    .use("/status", tableStatus)
     .use("/menu/overall-best", overallBestSellers)
     .use("/menu/overall-worst", overallWorstSellers)
     .use("/menu/monthly-comparison", monthlyComparison)
