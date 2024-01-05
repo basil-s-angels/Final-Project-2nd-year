@@ -56,7 +56,7 @@ export default function Form() {
           className="pl-3 w-40 text-center mb-3 self-center border border-black rounded-lg h-10 dark:text-black"
           required
         >
-          <option value="admin">Admin</option>
+          <option value="admin request">Request Admin Privileges</option>
           <option value="cook">Cook</option>
           <option value="service">Service</option>
         </select>

@@ -12,7 +12,12 @@ router.post("/", async (request: Request, response: Response) => {
     const { email, password } = request.body;
 
     const { rows } = await client.query<User>(
-      "SELECT * FROM users WHERE email = $1",
+      `
+      SELECT *
+      FROM users
+      WHERE email = $1
+      AND position != 'admin request'
+      `,
       [email],
     );
 

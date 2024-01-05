@@ -39,6 +39,7 @@ export default function AdminHome() {
     [],
   );
   const [employees, setEmployees] = useState([]);
+  const [requests, setRequests] = useState([]);
 
   useEffect(() => {
     Promise.all([
@@ -49,6 +50,7 @@ export default function AdminHome() {
         `${process.env.NEXT_PUBLIC_SERVER_URL}/statistics/monthly-comparison`,
       ),
       fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/employees`),
+      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/employees/requests`),
     ])
       .then((responses) => Promise.all(responses.map((res) => res.json())))
       .then(
@@ -58,12 +60,14 @@ export default function AdminHome() {
           dailyOrders,
           monthlyComparison,
           employees,
+          requests,
         ]) => {
           setOverallBest(overallBest);
           setOverallWorst(overallWorst);
           setDailyOrders(dailyOrders);
           setMonthlyComparison(monthlyComparison);
           setEmployees(employees);
+          setRequests(requests);
         },
       )
       .catch((error) => console.error(error));
@@ -74,6 +78,7 @@ export default function AdminHome() {
   console.log(dailyOrders, "daily avg");
   console.log(monthlyComparison, "monthly");
   console.log(employees, "emps");
+  console.log(requests, "req");
 
   return (
     <div className="flex-col md:flex">
@@ -293,8 +298,8 @@ export default function AdminHome() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {employees.length !== 0 ? (
-                    employees.map((item: any, index: number) => (
+                  {requests.length !== 0 ? (
+                    requests.map((item: any, index: number) => (
                       <div key={index}>
                         {index + 1}. {item.first_name} {item.last_name} (
                         {item.email})
@@ -304,14 +309,14 @@ export default function AdminHome() {
                               variant="destructive"
                               className="basis-[10%] text-center text-sm"
                             >
-                              Cancel
+                              Approve
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
                               <DialogTitle>Warning!</DialogTitle>
                               <DialogDescription>
-                                Would you like to remove this user?
+                                Would you like to approve this user as an admin?
                               </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
@@ -320,24 +325,27 @@ export default function AdminHome() {
                                   variant={"destructive"}
                                   onClick={async () => {
                                     fetch(
-                                      `${process.env.NEXT_PUBLIC_SERVER_URL}/employees/${item.email}`,
+                                      `${process.env.NEXT_PUBLIC_SERVER_URL}/employees/requests`,
                                       {
-                                        method: "DELETE",
+                                        method: "PATCH",
                                         headers: {
                                           "Content-Type": "application/json",
                                         },
+                                        body: JSON.stringify({
+                                          email: item.email,
+                                        }),
                                       },
                                     )
                                       .then((response) => {
                                         response.json();
                                         console.log(
-                                          `${item.first_name} deleted`,
+                                          `${item.first_name} updated`,
                                         );
                                       })
                                       .catch((error) => console.error(error));
                                   }}
                                 >
-                                  Remove
+                                  Approve
                                 </Button>
                               </DialogClose>
                             </DialogFooter>
@@ -346,7 +354,7 @@ export default function AdminHome() {
                       </div>
                     ))
                   ) : (
-                    <div>No employees...</div>
+                    <div>No requests...</div>
                   )}
                 </CardContent>
               </Card>
