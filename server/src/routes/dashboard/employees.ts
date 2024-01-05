@@ -26,4 +26,23 @@ router.get("/", async (request: Request, response: Response) => {
   }
 });
 
+router.delete("/:email", async (request: Request, response: Response) => {
+  try {
+    const client = await pool.connect();
+    const { rows } = await client.query(
+      `
+      DELETE FROM users
+      WHERE email = $1
+      `,
+      [request.params.email],
+    );
+
+    client.release();
+    return response.json(rows);
+  } catch (error) {
+    console.error(error);
+    return response.json([]);
+  }
+});
+
 export default router;

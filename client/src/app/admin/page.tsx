@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { LineItem } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 
 export default function AdminHome() {
   const [overallBest, setOverallBest] = useState<Array<LineItem>>([]);
@@ -21,70 +22,33 @@ export default function AdminHome() {
   );
   const [employees, setEmployees] = useState([]);
 
-  async function fetchData() {
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/menu/overall-best`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((results) => {
-        setOverallBest(results);
-      })
-      .catch((error) => console.error(error));
-
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/menu/overall-worst`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((results) => {
-        setOverallWorst(results);
-      })
-      .catch((error) => console.error(error));
-
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/menu/daily-average`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((results) => {
-        setDailyAvg(results);
-      })
-      .catch((error) => console.error(error));
-
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/menu/monthly-comparison`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((results) => {
-        setMonthlyComparison(results);
-      })
-      .catch((error) => console.error(error));
-
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/all-employees`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((results) => {
-        setEmployees(results);
-      })
-      .catch((error) => console.error(error));
-  }
-
   useEffect(() => {
-    fetchData();
+    Promise.all([
+      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/statistics/overall-best`),
+      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/statistics/overall-worst`),
+      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/statistics/daily-average`),
+      fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/statistics/monthly-comparison`,
+      ),
+      fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/employees`),
+    ])
+      .then((responses) => Promise.all(responses.map((res) => res.json())))
+      .then(
+        ([
+          overallBest,
+          overallWorst,
+          dailyAvg,
+          monthlyComparison,
+          employees,
+        ]) => {
+          setOverallBest(overallBest);
+          setOverallWorst(overallWorst);
+          setDailyAvg(dailyAvg);
+          setMonthlyComparison(monthlyComparison);
+          setEmployees(employees);
+        },
+      )
+      .catch((error) => console.error(error));
   }, []);
 
   console.log(overallBest, "best seller?");
@@ -261,14 +225,39 @@ export default function AdminHome() {
                     <CardTitle className="text-center">Employees</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {employees.map((item: any, index: number) => (
-                      <div key={index}>
-                        <div>
-                          {index + 1}. {item.first_name} {item.last_name} (
-                          {item.email})
+                    {employees.length !== 0 ? (
+                      employees.map((item: any, index: number) => (
+                        <div key={index}>
+                          <div>
+                            {index + 1}. {item.first_name} {item.last_name} (
+                            {item.email})
+                            <Button
+                              variant={"destructive"}
+                              onClick={async () => {
+                                fetch(
+                                  `${process.env.NEXT_PUBLIC_SERVER_URL}/employees/${item.email}`,
+                                  {
+                                    method: "DELETE",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                    },
+                                  },
+                                )
+                                  .then((response) => {
+                                    response.json();
+                                    console.log(`${item.first_name} deleted`);
+                                  })
+                                  .catch((error) => console.error(error));
+                              }}
+                            >
+                              Remove
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <div>No employees...</div>
+                    )}
                   </CardContent>
                 </Card>
               </div>

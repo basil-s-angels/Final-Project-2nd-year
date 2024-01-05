@@ -10,7 +10,6 @@ export default async function fetchUser() {
 
     if (response.ok) {
       const result = await response.json();
-      console.log("this is the result: ", result.decoded);
       return result.decoded;
     }
   } catch (error) {

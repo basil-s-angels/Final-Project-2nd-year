@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { Menu } from "lucide-react";
@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Logout from "@/components/ui/logout";
+import { UserJWT } from "@/lib/types";
+import fetchUser from "@/lib/getUser";
 
 export default function AdminLayout({
   children,
@@ -23,8 +25,15 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<UserJWT | null>(null);
   const pathname = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    fetchUser()
+      .then((response) => setUser(response))
+      .catch((error) => console.error(error));
+  });
 
   return (
     <section>
@@ -35,7 +44,13 @@ export default function AdminLayout({
           </SheetTrigger>
           <SheetContent side={"left"}>
             <SheetHeader>
-              <SheetTitle>[Position] Admin Name here...</SheetTitle>
+              {user ? (
+                <SheetTitle>
+                  [{user.position}] {user.firstName + " " + user.lastName}
+                </SheetTitle>
+              ) : (
+                <SheetTitle>Log in first</SheetTitle>
+              )}
               <SheetDescription className="flex flex-col">
                 {pathname === "/admin" ? (
                   <Button disabled variant={"ghost"} className="font-bold">
