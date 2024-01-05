@@ -18,14 +18,20 @@ export default function StatusPage({ params }: { params: { table: number } }) {
   const tableNum = params.table;
   const [foodOrders, setFoodOrders] = useState<Array<{ id: number }>>([]);
   const router = useRouter();
+  interface foodDetails {
+    id: number;
+    name: string;
+    quantity: number;
+    price: number;
+    status: string;
+    comment: string;
+    table_num: number;
+  }
 
   useEffect(() => {
     async function fetchStatus() {
       fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/status/${tableNum}`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
       })
         .then((response) => response.json())
         .then((data) => {
@@ -46,15 +52,14 @@ export default function StatusPage({ params }: { params: { table: number } }) {
     };
   }, [tableNum]);
 
-  let groupedData: any = [];
-
+  let groupedData: Array<foodDetails[]> = [];
   foodOrders.forEach((item) => {
     let id = item.id;
 
     if (!groupedData[id - 1]) {
       groupedData[id - 1] = [];
     }
-    groupedData[id - 1].push(item);
+    groupedData[id - 1].push(item as foodDetails);
   });
 
   return (
@@ -67,7 +72,7 @@ export default function StatusPage({ params }: { params: { table: number } }) {
           <div className="border-t border-blue-800 mb-4"></div>
           <div className="flex items-center justify-center ">
             <div className="text-lg font-bold">
-              {groupedData.map((foodOrder: any, index: number) => (
+              {groupedData.map((foodOrder: foodDetails[], index: number) => (
                 <div
                   key={index}
                   className="border border-slate-600 mb-7 py-3 rounded-xl text-center bg-slate-900"
@@ -83,40 +88,29 @@ export default function StatusPage({ params }: { params: { table: number } }) {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {foodOrder.map(
-                        (
-                          lineItem: {
-                            name: string;
-                            quantity: number;
-                            price: number;
-                          },
-                          index: number,
-                        ) => (
-                          <TableRow key={index + 1}>
-                            <TableCell className="font-medium text-center">
-                              {index + 1}
-                            </TableCell>
-                            <TableCell className="text-left">
-                              {lineItem.name}
-                            </TableCell>
-                            <TableCell className="text-center">
-                              {lineItem.quantity}
-                            </TableCell>
-                          </TableRow>
-                        ),
-                      )}
+                      {foodOrder.map((lineItem, index: number) => (
+                        <TableRow key={index + 1}>
+                          <TableCell className="font-medium text-center">
+                            {index + 1}
+                          </TableCell>
+                          <TableCell className="text-left">
+                            {lineItem.name}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {lineItem.quantity}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                   <Separator />
                   <div className="text-sm mt-3">
                     Your total bill: ₱
                     {Number(
-                      foodOrder.reduce(
-                        (total: number, item: any) =>
-                          total + Number(item.price) * item.quantity,
-                        0,
-                      ),
-                    ).toFixed(2)}{" "}
+                      foodOrder.reduce((total: number, item) => {
+                        return total + item.price * item.quantity;
+                      }, 0),
+                    ).toFixed(2)}
                     <br />
                     Status: {foodOrder[0].status} <br />
                     Your comment/s: {foodOrder[0].comment}
