@@ -11,24 +11,61 @@ interface CartItem {
 }
 
 type OrdercartProps = {
-  orders: Array<{ itemName: string; quantity: number; price: number }>;
+  orders: Array<{
+    id: number;
+    itemName: string;
+    quantity: number;
+    price: number;
+  }>;
 };
 
 const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
   const [cartItems, setcartItems] = useState<any[]>([]);
   const [quantities, setQuantities] = useState<number[]>([]);
   const [comment, setComment] = useState("");
-
+  const [, updateState] = useState<number | null>(null);
   useEffect(() => {
     console.log(orders, "orders");
     setcartItems(orders);
     setQuantities(orders.map(() => 1));
   }, [orders]);
 
+  useEffect(() => {
+    console.log(cartItems);
+  }, [cartItems]);
+
   const calculateSubtotal = () => {
     return cartItems.reduce(
       (total, item) => total + item.price * item.quantity,
       0,
+    );
+  };
+
+  const handleRemoveOrder = (id: number) => {
+    setcartItems(
+      cartItems
+        .map((item) => {
+          if (item.id === id && item.quantity > 1) {
+            return { ...item, quantity: item.quantity - 1 };
+          } else if (item.id === id && item.quantity === 1) {
+            return null;
+          } else {
+            return item;
+          }
+        })
+        .filter(Boolean),
+    );
+  };
+
+  const handleAddOrder = (id: number) => {
+    setcartItems(
+      cartItems.map((item) => {
+        if (item.id === id && item.quantity >= 1) {
+          return { ...item, quantity: item.quantity + 1 };
+        } else {
+          return item;
+        }
+      }),
     );
   };
 
@@ -84,20 +121,29 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order, index) => (
+                  {cartItems.map((order, index) => (
                     <tr key={index}>
                       <td className="py-4">
                         <div className="flex-items-center">
                           <span className="min-[320px]:text-xs max-[600px]:ml-0 md:text-lg text-center text-blue-800 font-semibold ml-2">
-                            {" "}
-                            {order.itemName}{" "}
+                            {order.itemName}
                           </span>
                         </div>
                       </td>
                       <td className="py-4">
                         <div className="flex-items-center">
-                          <span className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg text-gray-700 w-9 mx-2 md:pl-6">
+                          <span className="min-[320px]:text-xs max-[600px]:pl-0 md:text-lg text-center text-blue-800 font-semibold">
+                            <button onClick={() => handleRemoveOrder(order.id)}>
+                              -
+                            </button>
+                          </span>
+                          <span className="min-[320px]:text-xs max-[600px]:pl-0 md:text-lg text-gray-700 w-9 mx-2">
                             {order.quantity}
+                          </span>
+                          <span className="min-[320px]:text-xs max-[600px]:pr-0 md:text-lg text-center text-blue-800 font-semibold">
+                            <button onClick={() => handleAddOrder(order.id)}>
+                              +
+                            </button>
                           </span>
                         </div>
                       </td>
