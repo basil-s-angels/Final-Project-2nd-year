@@ -1,234 +1,423 @@
+/* eslint-disable no-unused-vars */
 "use client";
-// EmployeeDashboard.jsx
-import React, { useEffect, useState } from "react";
 
-import { UserJWT } from "@/lib/types";
-import fetchUser from "@/lib/getUser";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
-// Interface definitions
-
-interface Employee {
+interface Invoice {
+  total_price: number;
+  quantity: number;
   id: number;
   name: string;
-  position: string;
-  email: string;
+  comment: string;
+  code: string;
+  created_at: string;
+  price: number;
+  status: string;
 }
 
-interface Order {
-  id: number;
-  tableNumber: number;
-  orderDate: string;
-  amount: number;
+interface LineItem {
+  name: string;
+  quantity: number;
+  price: number;
 }
 
-// Example data
-
-const employees: Employee = {
-  id: 1234,
-  name: "basil amso",
-  position: "waiter",
-  email: "help@cpu.com",
-};
-
-const orders: Order[] = [
-  {
-    id: 1,
-    tableNumber: 5,
-    orderDate: "2023-04-06",
-    amount: 35.99,
-  },
-  {
-    id: 2,
-    tableNumber: 10,
-    orderDate: "2023-04-06",
-    amount: 300.99,
-  },
-  {
-    id: 3,
-    tableNumber: 10,
-    orderDate: "2023-04-06",
-    amount: 300.99,
-  },
-  {
-    id: 4,
-    tableNumber: 10,
-    orderDate: "2023-04-06",
-    amount: 300.99,
-  },
-  {
-    id: 5,
-    tableNumber: 11,
-    orderDate: "2020-04-06",
-    amount: 1000.99,
-  },
-  {
-    id: 5,
-    tableNumber: 1,
-    orderDate: "2020-04-05",
-    amount: 2000,
-  },
-  {
-    id: 5,
-    tableNumber: 2,
-    orderDate: "2019-04-05",
-    amount: 5000,
-  },
-];
+interface SelectedInvoice {
+  rows: LineItem[];
+}
 
 export default function EmployeeDashboard() {
-  let [isOpen, setIsOpen] = useState(false);
-  let [user, setUser] = useState<UserJWT | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [groupData, setGroupData] = useState<any[]>([]);
+  const [selectedInvoice, setSelectedInvoice] = useState<SelectedInvoice>();
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
 
   useEffect(() => {
-    fetchUser()
-      .then((user) => {
-        setUser(user);
-      })
-      .catch((error) => {
-        console.error(error);
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "from useeffect");
+        setInvoices(data);
+        setGroupData(data);
       });
   }, []);
 
-  const calculateTotalAmount: () => number = () => {
-    const totalAmount = orders.reduce((sum, order) => sum + order.amount, 0);
-    return parseFloat(totalAmount.toFixed(2));
+  async function handleClick(invoiceId: number) {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee/${invoiceId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "rows from the database");
+        setSelectedInvoice(data);
+      });
+  }
+
+  async function handleYearClick(year: number) {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee/${year}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "rows from the database");
+        setSelectedYear(year.toString()); // Set the selected year
+      });
+  }
+
+  async function handleMonthClick(month: string) {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee/${month}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "rows from the database");
+        setSelectedMonth(month); // Set the selected month
+      });
+  }
+
+  async function handleDayClick(day: string) {
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/employee/${day}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "rows from the database");
+        setSelectedDay(day); // Set the selected day
+      });
+  }
+
+  const totalAmountForAllOrders = () => {
+    return invoices.reduce(
+      (total, invoice) => total + invoice.price * invoice.quantity,
+      0,
+    );
   };
 
-  const sortedOrders = [...orders].sort(
-    (a, b) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime(),
-  );
+  let groupedData: any[] = [];
+  groupData.forEach((item) => {
+    let id = item.id;
+
+    if (!groupedData[id - 1]) {
+      groupedData[id - 1] = [];
+    }
+    groupedData[id - 1].push(item);
+  });
+
+  useEffect(() => {
+    if (selectedYear && selectedMonth && selectedDay) {
+      // Filter the data based on the selected year, month, and day
+      const filtered = groupedData.filter((item) => {
+        const date = new Date(item[0].created_at);
+        date.setUTCHours(0, 0, 0, 0);
+        const year = String(date.getUTCFullYear()).padStart(4, "0");
+        const month = String(date.getUTCMonth() + 1).padStart(2, "0"); // Months are zero-based in JS
+        const day = String(date.getUTCDate()).padStart(2, "0");
+        const yearMatches = year === selectedYear;
+        const monthMatches = month === selectedMonth;
+        const dayMatches = day === selectedDay;
+        return yearMatches && monthMatches && dayMatches;
+      });
+      setFilteredData(filtered);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedYear, selectedMonth, selectedDay]);
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="container mx-auto">
-        <h1 className="text-2xl md:text-4xl font-bold text-center text-white mb-4 md:mb-8">
+    <div className="min-h-screen p-4 md:p-8 bg-gray-900 text-white">
+      <div className="container mx-auto bg-gray-800 rounded-lg shadow-lg p-4 md:p-8">
+        <h1 className="text-2xl md:text-4xl font-bold text-center mb-4 md:mb-8">
           Employee Dashboard
         </h1>
 
-        <div className="flex-1">
-          <div className="mb-4 grid text-white grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4 md:gap-12">
-            <div className="bg-white p-4 rounded shadow">
-              <p className="text-lg font-semibold text-black">
-                Name: {user && user.firstName + " " + user.lastName}
-              </p>
-              <p className="text-lg text-black">
-                Position: {user && user.position}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-between mb-4 md:mb-8 p-3 md:p-6 bg-gradient-to-r from-green-300 via-green-500 to-green-700 rounded-lg shadow-lg">
-          <button className="px-3 md:px-4 py-2 bg-transparent text-white rounded hover:bg-green-800 duration-300 ease-in-out transform hover:-translate-y-1 mr-2 md:mr-4">
-            Tables
-          </button>
-          <button className="px-3 md:px-4 py-2 bg-transparent text-white rounded hover:bg-green-800 duration-300 ease-in-out transform hover:-translate-y-1">
-            Orders
-          </button>
-        </div>
-
-        <div className="fixed top-0.5 left-2 w-full">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex justify-start items-center">
-              <button
-                className="h-12 w-12 flex flex-col justify-center items-center group mr-4"
-                onClick={() => setIsOpen(!isOpen)}
-              >
-                <div
-                  className={`h-1 w-6 my-1 bg-white rounded transition duration-300 ease-in-out ${
-                    isOpen ? "transform rotate-45 translate-y-2.5" : ""
-                  }`}
-                />
-                <div
-                  className={`h-1 w-6 my-1 bg-white rounded transition duration-300 ease-in-out ${
-                    isOpen ? "opacity-0" : ""
-                  }`}
-                />
-                <div
-                  className={`h-1 w-6 my-1 bg-white rounded transition duration-300 ease-in-out ${
-                    isOpen ? "transform -rotate-45 -translate-y-2.5" : ""
-                  }`}
-                />
-              </button>
-            </div>
-            {isOpen && (
-              <div className="absolute top-14 left-0 bg-white p-4 rounded shadow-lg">
-                <h3 className="text-lg md:text-xl text-center text-black font-semibold mt-2">
-                  {employees.name}
-                </h3>
-                <p className="text-sm md:text-base text-center text-black text-gray-600">
-                  {employees.position}
-                </p>
-                <p className="text-sm md:text-base text-black text-center">
-                  {employees.email}
-                </p>
-                <div className="flex justify-center space-x-4 mt-4">
-                  <button
-                    className="px-3 md:px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Close
-                  </button>
-                  <button
-                    className="px-3 md:px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="flex flex-wrap md:flex-nowrap gap-4 md:gap-6 mb-4 md:mb-8">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-4 md:mb-8">
           <div className="flex-1">
-            <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 text-white">
+            <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">
               Done Orders
             </h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
-                <thead className="bg-gray-200 text-gray-600">
-                  <tr>
-                    <th className="py-2 px-4 md:py-3 md:px-6 text-left text-black">
-                      Table No.
-                    </th>
-                    <th className="py-2 px-4 md:py-3 md:px-6 text-center text-black">
-                      Date
-                    </th>
-                    <th className="py-2 px-4 md:py-3 md:px-6 text-right text-black">
-                      Amount
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="text-gray-700">
-                  {sortedOrders.map((order) => (
-                    <tr key={order.id} className="border-b hover:bg-gray-100">
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-left text-black">
-                        Table {order.tableNumber}
-                      </td>
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-center text-black">
-                        {order.orderDate}
-                      </td>
-                      <td className="py-2 px-4 md:py-3 md:px-6 text-right text-black">
-                        P {order.amount.toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
-                  {/* Display total amount row */}
-                  <tr className="bg-gray-200">
-                    <td
-                      colSpan={2}
-                      className="py-2 px-4 md:py-3 md:px-6 text-left text-black font-semibold"
+            <p className="flex justify-center space-x-4 gap-4 mb-4 md:mb-4">
+              Filter Done Orders
+            </p>
+            <div className="flex justify-center space-x-4">
+              <Button
+                onClick={() => {
+                  setSelectedYear(null);
+                  setSelectedMonth(null);
+                  setSelectedDay(null);
+                  setFilteredData(groupedData); // Set filteredData to groupedData when All button is clicked
+                }}
+                className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+              >
+                All
+              </Button>
+              <Popover>
+                <PopoverTrigger
+                  className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
+                px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+                >
+                  {selectedYear ? `Year: ${selectedYear}` : "Year"}
+                </PopoverTrigger>
+                <PopoverContent>
+                  {[2020, 2021, 2022, 2023, 2024].map((year, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleYearClick(year)}
+                      className="block w-full text-left px-4 py-2 hover:bg-green-500 hover:text-white"
                     >
-                      Total Amount:
-                    </td>
-                    <td className="py-2 px-4 md:py-3 md:px-6 text-right text-black font-semibold">
-                      P{calculateTotalAmount()}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                      {year}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+
+              <Popover>
+                <PopoverTrigger
+                  className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
+                px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+                >
+                  {selectedMonth ? `Month: ${selectedMonth}` : "Month"}
+                </PopoverTrigger>
+                <PopoverContent className="max-h-60 overflow-auto">
+                  {[
+                    "01",
+                    "02",
+                    "03",
+                    "04",
+                    "05",
+                    "06",
+                    "07",
+                    "08",
+                    "09",
+                    "10",
+                    "11",
+                    "12",
+                  ].map((month, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleMonthClick(month)}
+                      className="block w-full text-left px-4 py-2 hover:bg-green-500 hover:text-white"
+                    >
+                      {month}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+
+              <Popover>
+                <PopoverTrigger
+                  className="bg-gray-500 hover:bg-green-700 text-white font-bold py-2 
+                px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+                >
+                  {selectedDay ? `Day: ${selectedDay}` : "Day"}
+                </PopoverTrigger>
+                <PopoverContent className="max-h-60 overflow-auto">
+                  {Array.from({ length: 31 }, (_, i) =>
+                    (i + 1).toString().padStart(2, "0"),
+                  ).map((day, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleDayClick(day)}
+                      className="block w-full text-left px-4 py-2 hover:bg-green-500 hover:text-white"
+                    >
+                      {day}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+            </div>
+            {/* Display total amount for "Done" orders */}
+            <div className="mb-4 text-left">
+              <p className="text-2xl font-bold">
+                Total Amount: P{totalAmountForAllOrders().toFixed(2)}
+              </p>
+            </div>
+            {/* Display Done Orders table */}
+            <div className="flex justify-center">
+              <div className="overflow-x-auto">
+                <Table className="mx-auto bg-gray-700 rounded-lg shadow overflow-hidden table-fixed">
+                  <TableCaption>A list of your recent invoices.</TableCaption>
+                  <TableHeader>
+                    <TableRow className="grid grid-cols-3">
+                      <TableHead className="w-full py-3 px-4 md:py-3 md:px-6 text-center">
+                        Invoice No:
+                      </TableHead>
+                      <TableHead className="w-full py-3 px-4 md:py-3 md:px-6 text-center">
+                        Created at:
+                      </TableHead>
+                      <TableHead className="w-full py-3 px-4 md:py-3 md:px-6 text-center">
+                        Amount:
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredData.map((invoice, index) => (
+                      <Dialog key={index}>
+                        <DialogTrigger asChild>
+                          <div className="flex flex-col items-center">
+                            <TableRow
+                              className="grid grid-cols-3 w-full"
+                              onClick={async () => {
+                                console.log("Clicked Invoice:", invoice[0]);
+                                await handleClick(invoice[0]?.id);
+                              }}
+                            >
+                              <TableHead className="w-full py-4 px-4 md:py-4 md:px-6 text-center text-white">
+                                {invoice[0]?.id}
+                              </TableHead>
+                              <TableHead className="w-full py-4 px-4 md:py-4 md:px-6 text-center text-white">
+                                {new Date(
+                                  invoice[0]?.created_at,
+                                ).toLocaleDateString()}
+                              </TableHead>
+                              <TableHead className="w-full py-4 px-4 md:py-4 md:px-6 text-center text-white">
+                                P
+                                {Number(
+                                  invoice.reduce(
+                                    (
+                                      total: number,
+                                      item: { price: number; quantity: number },
+                                    ) =>
+                                      total +
+                                      Number(item.price) * item.quantity,
+                                    0,
+                                  ),
+                                ).toFixed(2)}
+                              </TableHead>
+                            </TableRow>
+                          </div>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Invoice #{invoice[0]?.id}</DialogTitle>
+                            <DialogDescription>
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead className="w-[100px] text-center">
+                                      Num
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                      Food Name
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                      Quantity
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                      Price
+                                    </TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {selectedInvoice &&
+                                    selectedInvoice.rows.map(
+                                      (lineItem: LineItem, index: number) => (
+                                        <TableRow key={index + 1}>
+                                          <TableCell className="font-medium text-center text-white">
+                                            {index + 1}
+                                          </TableCell>
+                                          <TableCell className="text-center text-white">
+                                            {lineItem.name}
+                                          </TableCell>
+                                          <TableCell className="text-center text-white">
+                                            {lineItem.quantity}
+                                          </TableCell>
+                                          <TableCell className="text-center text-white">
+                                            P
+                                            {(
+                                              lineItem.price * lineItem.quantity
+                                            ).toFixed(2)}
+                                          </TableCell>
+                                        </TableRow>
+                                      ),
+                                    )}
+                                </TableBody>
+                                <TableFooter>
+                                  <TableRow>
+                                    <TableCell
+                                      colSpan={3}
+                                      className="text-center"
+                                    >
+                                      Total
+                                    </TableCell>
+                                    <TableCell className="text-center text-white">
+                                      P
+                                      {selectedInvoice &&
+                                        Number(
+                                          selectedInvoice.rows.reduce(
+                                            (
+                                              total: number,
+                                              item: {
+                                                price: number;
+                                                quantity: number;
+                                              },
+                                            ) =>
+                                              total +
+                                              Number(item.price) *
+                                                item.quantity,
+                                            0,
+                                          ),
+                                        ).toFixed(2)}
+                                    </TableCell>
+                                  </TableRow>
+                                </TableFooter>
+                              </Table>
+                              <br />
+                              Comments: {invoice[0].comment} <br />
+                              Status: {invoice[0].status}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter className="sm:justify-start">
+                            <DialogClose asChild>
+                              <Button type="button" variant="secondary">
+                                Close
+                              </Button>
+                            </DialogClose>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </div>
         </div>
