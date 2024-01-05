@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import Ordercart from "../../order-basket/order-basket";
+import Ordercart from "@/components/ui/order-basket";
 import Image from "next/image";
 
 interface FoodItem {

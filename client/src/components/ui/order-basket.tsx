@@ -1,11 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useState, useEffect } from "react";
-// import { useRouter } from "next/navigation";
+
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 interface FoodItem {
-  id: number;
+  itemId: number;
   name: string;
   quantity: number;
   price: number;
@@ -13,7 +14,7 @@ interface FoodItem {
 
 type OrdercartProps = {
   orders: Array<{
-    id: number;
+    itemId: number;
     name: string;
     quantity: number;
     price: number;
@@ -25,10 +26,12 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
   const [cartItems, setcartItems] = useState<FoodItem[]>([]);
   const [, setQuantities] = useState<number[]>([]);
   const [comment, setComment] = useState("");
-  // const router = useRouter()
+  const router = useRouter();
+  const tableNum = orders[0].tableNum;
 
   useEffect(() => {
     console.log(orders, "orders");
+    console.log(tableNum);
     setcartItems(orders);
     setQuantities(orders.map(() => 1));
   }, [orders]);
@@ -48,9 +51,9 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
     setcartItems(
       cartItems
         .map((item: FoodItem) => {
-          if (item.id === id && item.quantity > 1) {
+          if (item.itemId === id && item.quantity > 1) {
             return { ...item, quantity: item.quantity - 1 };
-          } else if (item.id === id && item.quantity === 1) {
+          } else if (item.itemId === id && item.quantity === 1) {
             return null;
           } else {
             return item;
@@ -63,7 +66,7 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
   const handleAddOrder = (id: number) => {
     setcartItems(
       cartItems.map((item) => {
-        if (item.id === id) {
+        if (item.itemId === id) {
           return { ...item, quantity: item.quantity + 1 };
         } else {
           return item;
@@ -91,9 +94,9 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
       }),
     })
       .then((response) => response.json())
-      .then((result) => console.log(result, "shshs"));
+      .catch((error) => console.error(error));
 
-    alert("Thank you for choosing us!");
+    // alert("Thank you for choosing us!");
   };
 
   return (
@@ -136,7 +139,9 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
                       <td className="py-4">
                         <div className="flex-items-center">
                           <span className="min-[320px]:text-xs max-[600px]:pl-0 md:text-lg text-center text-blue-800 font-semibold">
-                            <button onClick={() => handleRemoveOrder(order.id)}>
+                            <button
+                              onClick={() => handleRemoveOrder(order.itemId)}
+                            >
                               -
                             </button>
                           </span>
@@ -144,7 +149,9 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
                             {order.quantity}
                           </span>
                           <span className="min-[320px]:text-xs max-[600px]:pr-0 md:text-lg text-center text-blue-800 font-semibold">
-                            <button onClick={() => handleAddOrder(order.id)}>
+                            <button
+                              onClick={() => handleAddOrder(order.itemId)}
+                            >
                               +
                             </button>
                           </span>
@@ -188,7 +195,7 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
               <Button
                 className="min-[320px]:text-xs max-[600px]:pl-2 md:text-lg bg-blue-500 text-white-700 py-2 px-3 rounded-lg mt-4 w-full"
                 onClick={() => {
-                  // router.push(`${tableNum}/status`)
+                  router.push(`/${tableNum}/status`);
                   handleCheckout();
                 }}
                 variant={"default"}

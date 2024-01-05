@@ -3,38 +3,12 @@ import { pool } from "../../server";
 
 const router = express.Router();
 
-router.get("/menu-page", async (request: Request, response: Response) => {
-  try {
-    const client = await pool.connect();
-    const result = await client.query("SELECT * FROM foods");
-    client.release();
-    response.json(result.rows);
-  } catch (error) {
-    console.error(error);
-    response
-      .status(500)
-      .json({ error: "An error occurred while fetching the menu items." });
-  }
-});
-
-router.get("/", async (request: Request, response: Response) => {
-  try {
-    const client = await pool.connect();
-    const result = await client.query("SELECT name, price FROM foods");
-    client.release();
-    response.json(result.rows);
-  } catch (error) {
-    console.log(error);
-    response
-      .status(500)
-      .json({ error: "An error occured while fetching the base price" });
-  }
-});
-
 router.post("/", async (request: Request, response: Response) => {
   try {
     const { selected, comment } = await request.body;
+    const tableNum = selected[0].tableNum;
     console.log(selected, "from orders");
+    console.log(tableNum, "from orders");
     console.log(comment, "from orders");
     const client = await pool.connect();
     const res1 = await client.query(
@@ -45,9 +19,9 @@ router.post("/", async (request: Request, response: Response) => {
       (NOW(),
       'waiting for payment',
       $1,
-      5)
+      $2)
       RETURNING id`,
-      [comment],
+      [comment, tableNum],
     );
     const invoiceId = res1.rows[0].id;
     console.log(res1.rows[0], "res rows");
@@ -56,8 +30,8 @@ router.post("/", async (request: Request, response: Response) => {
     // // Then, insert into line_items using the newly generated id
     const values = selected
       .map(
-        (item: { id: any; quantity: any }) =>
-          `(${item.quantity}, ${item.id}, ${invoiceId})`,
+        (item: { itemId: number; quantity: number }) =>
+          `(${item.quantity}, ${item.itemId}, ${invoiceId})`,
       )
       .join(", ");
 
