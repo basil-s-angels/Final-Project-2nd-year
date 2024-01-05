@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
@@ -16,6 +16,7 @@ import invoiceTableQuery from "./routes/invoices/queries/tableNumQuery";
 import invoiceFoodQuery from "./routes/invoices/queries/foodNameQuery";
 import employees from "./routes/dashboard/employees";
 import tableStatus from "./routes/status-page/status";
+import allOrders from "./routes/done-orders/allOrders";
 import statistics from "./routes/dashboard/statistics";
 
 export const pool = new Pool({
@@ -51,6 +52,7 @@ async function serverStart() {
     .use("/invoices/tableNum", invoiceTableQuery)
     .use("/invoices/foodName", invoiceFoodQuery)
     .use("/status", tableStatus)
+    .use("/admin/employee", allOrders)
     .use("/statistics", statistics)
     .use("/employees", employees);
 
