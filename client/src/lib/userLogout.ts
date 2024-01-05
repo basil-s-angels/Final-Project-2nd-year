@@ -1,7 +1,7 @@
-export default async function fetchUser() {
+export default async function userLogout() {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/user`, {
-      method: "GET",
+      method: "DELETE",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
@@ -10,7 +10,7 @@ export default async function fetchUser() {
 
     if (response.ok) {
       const result = await response.json();
-      return result.decoded;
+      console.log(result.message);
     }
   } catch (error) {
     console.error(error);

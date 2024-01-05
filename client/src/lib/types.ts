@@ -16,6 +16,11 @@ export interface LineItem {
   quantity: number;
   price: string;
   date_format: string;
+  total: number;
+  this_month_revenue: number;
+  last_month_revenue: number;
+  invoices_today: number;
+  invoices_yesterday: number;
 }
 
 export interface OrderCardProps {

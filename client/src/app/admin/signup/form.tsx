@@ -37,7 +37,12 @@ export default function Form() {
 
   return (
     <main className="h-[100vh]">
-      <h1 className="ml-10 mt-4 mb-4 text-lg font-bold">Sign Up as an Admin</h1>
+      <h1 className="ml-10 mt-4 mb-4 text-lg font-bold">
+        Sign Up! Already have an account?
+        <Button variant="link" onClick={() => router.push("/admin/login")}>
+          Log in
+        </Button>
+      </h1>
       <form
         className="flex flex-col gap-2 mx-auto max-w-md"
         onSubmit={handleSubmit}

@@ -5,8 +5,7 @@
   "main": "server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "localhost": "ts-node ./src/server",
-    "start": "npm run localhost & ngrok http 8080",
+    "start": "ts-node ./src/server",
     "dev": "nodemon ./src/server",
     "prepare": "cd .. && husky install"
   },
@@ -21,7 +20,8 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.11.3"
+    "pg": "^8.11.3",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

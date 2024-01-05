@@ -27,14 +27,14 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
   const [, setQuantities] = useState<number[]>([]);
   const [comment, setComment] = useState("");
   const router = useRouter();
-  const tableNum = orders[0].tableNum;
+  const tableNum = orders[0] && orders[0].tableNum;
 
   useEffect(() => {
     console.log(orders, "orders");
     console.log(tableNum);
     setcartItems(orders);
     setQuantities(orders.map(() => 1));
-  }, [orders]);
+  }, [orders, tableNum]);
 
   useEffect(() => {
     console.log(cartItems);
@@ -77,11 +77,7 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
 
   const handleCheckout = async () => {
     console.log(cartItems, "cartitems");
-    console.log(comment);
-
-    if (comment.trim() === "") {
-      setComment("N/A");
-    }
+    const finalComment = comment.trim() === "" ? "N/A" : comment.trim();
 
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/orders`, {
       method: "POST",
@@ -90,7 +86,7 @@ const Ordercart: React.FC<OrdercartProps> = ({ orders }) => {
       },
       body: JSON.stringify({
         selected: cartItems,
-        comment: comment,
+        comment: finalComment,
       }),
     })
       .then((response) => response.json())
