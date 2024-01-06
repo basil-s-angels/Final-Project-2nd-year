@@ -18,7 +18,7 @@ export default function StatusPage({ params }: { params: { table: number } }) {
   const tableNum = params.table;
   const [foodOrders, setFoodOrders] = useState<Array<{ id: number }>>([]);
   const router = useRouter();
-  interface foodDetails {
+  interface FoodDetails {
     id: number;
     name: string;
     quantity: number;
@@ -52,14 +52,14 @@ export default function StatusPage({ params }: { params: { table: number } }) {
     };
   }, [tableNum]);
 
-  let groupedData: Array<foodDetails[]> = [];
+  let groupedData: Array<FoodDetails[]> = [];
   foodOrders.forEach((item) => {
     let id = item.id;
 
     if (!groupedData[id - 1]) {
       groupedData[id - 1] = [];
     }
-    groupedData[id - 1].push(item as foodDetails);
+    groupedData[id - 1].push(item as FoodDetails);
   });
 
   return (
@@ -72,7 +72,7 @@ export default function StatusPage({ params }: { params: { table: number } }) {
           <div className="border-t border-blue-800 mb-4"></div>
           <div className="flex items-center justify-center ">
             <div className="text-lg font-bold">
-              {groupedData.map((foodOrder: foodDetails[], index: number) => (
+              {groupedData.map((foodOrder: FoodDetails[], index: number) => (
                 <div
                   key={index}
                   className="border border-slate-600 mb-7 py-3 rounded-xl text-center bg-slate-900"
