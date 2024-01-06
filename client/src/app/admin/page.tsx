@@ -21,15 +21,6 @@ import {
   DialogDescription,
   DialogClose,
 } from "@radix-ui/react-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-} from "@radix-ui/react-dropdown-menu";
 
 export default function AdminHome() {
   const [overallBest, setOverallBest] = useState<Array<LineItem>>([]);
@@ -38,8 +29,8 @@ export default function AdminHome() {
   const [monthlyComparison, setMonthlyComparison] = useState<Array<LineItem>>(
     [],
   );
-  const [employees, setEmployees] = useState([]);
-  const [requests, setRequests] = useState([]);
+  const [employees, setEmployees] = useState<Array<LineItem>>([]);
+  const [requests, setRequests] = useState<Array<LineItem>>([]);
 
   useEffect(() => {
     Promise.all([
@@ -203,45 +194,11 @@ export default function AdminHome() {
                       <div key={index}>
                         {index + 1}. {item.first_name} {item.last_name} (
                         {item.email})
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="bg-slate-800 border-slate-600 capitalize"
-                            >
-                              sss
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-56">
-                            <DropdownMenuLabel>Update Role</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuRadioGroup
-                            // value={position || lineItems[0].status}
-                            // onValueChange={handleStatusChange}
-                            >
-                              <DropdownMenuRadioItem value="waiting for payment">
-                                Waiting for payment
-                              </DropdownMenuRadioItem>
-                              <DropdownMenuRadioItem value="pending">
-                                Pending
-                              </DropdownMenuRadioItem>
-                              <DropdownMenuRadioItem value="preparing">
-                                Preparing
-                              </DropdownMenuRadioItem>
-                              <DropdownMenuRadioItem value="serving">
-                                Serving
-                              </DropdownMenuRadioItem>
-                              <DropdownMenuRadioItem value="completed">
-                                Completed
-                              </DropdownMenuRadioItem>
-                            </DropdownMenuRadioGroup>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button
                               variant="destructive"
-                              className="basis-[10%] text-center text-sm"
+                              className="basis-[10%] text-center text-sm ml-6"
                             >
                               Cancel
                             </Button>
