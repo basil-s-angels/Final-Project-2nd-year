@@ -3,32 +3,68 @@
 import { Button } from "@/components/ui/button";
 import { FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { z } from "zod";
+
+const User = z.object({
+  first_name: z.string().min(1).max(18),
+  last_name: z.string().min(1).max(18),
+  email: z.string().email({ message: "Must be a valid email." }),
+  password: z
+    .string()
+    .min(6, { message: "Must be at least 6 characters long" })
+    .max(10, { message: "Must be less than 10 characters long" }),
+});
 
 export default function Form() {
   const router = useRouter();
+
+  const validateUser = (inputs: unknown) => {
+    return User.safeParse(inputs);
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/signup`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      const parsedData = validateUser({
+        position: formData.get("position"),
+        first_name: formData.get("first_name"),
+        last_name: formData.get("last_name"),
+        email: formData.get("email"),
+        password: formData.get("password"),
+      });
+
+      if (parsedData.success) {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/signup`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              position: formData.get("position"),
+              first_name: formData.get("first_name"),
+              last_name: formData.get("last_name"),
+              email: formData.get("email"),
+              password: formData.get("password"),
+            }),
           },
-          body: JSON.stringify({
-            position: formData.get("position"),
-            first_name: formData.get("fname"),
-            last_name: formData.get("lname"),
-            email: formData.get("email"),
-            password: formData.get("password"),
-          }),
-        },
-      );
-      if (response.ok) {
-        console.log("success!", response);
-        router.push("/admin/login");
+        );
+
+        if (response.ok) {
+          const contentType = response.headers.get("Content-Type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            console.log("success!", data);
+            router.push("/admin/login");
+          } else {
+            console.error("Unexpected response format");
+          }
+        }
+      } else {
+        console.error("Validation error:", parsedData.error);
       }
     } catch (error) {
       console.error("An error occurred:", error);
@@ -62,14 +98,14 @@ export default function Form() {
         </select>
         <input
           type="text"
-          name="fname"
+          name="first_name"
           placeholder="First Name"
           className="pl-2 border border-black rounded-lg h-10 dark:text-black"
           required
         />
         <input
           type="text"
-          name="lname"
+          name="last_name"
           placeholder="Last Name"
           className="pl-2 border border-black rounded-lg h-10 dark:text-black"
           required
