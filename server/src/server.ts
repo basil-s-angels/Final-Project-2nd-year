@@ -33,15 +33,16 @@ async function serverStart() {
   app.get("/", async (req, res) => {
     res.send(`Hello world!`);
   });
-  const corsOptions = {
-    origin: "*",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-    optionsSuccessStatus: 204,
-  };
+
   app
     .set("trust proxy", 1)
-    .use(cors(corsOptions))
+    .use(
+      cors({
+        origin: process.env.CLIENT_URL,
+        credentials: true,
+        optionsSuccessStatus: 200,
+      }),
+    )
     .use(cookieParser())
     .use(bodyParser.json())
     .use(bodyParser.urlencoded({ extended: true }))
