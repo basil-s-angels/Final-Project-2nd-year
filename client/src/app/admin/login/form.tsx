@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import setCookie from "./setCookie";
 
 export default function Form() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function Form() {
         if (result.success) {
           console.log("success! from login form", result);
           router.push("/admin");
+          setCookie(result.token);
         }
       } else {
         console.error("HTTP error:", response.statusText);

@@ -42,11 +42,11 @@ router.post("/", async (request: Request, response: Response) => {
         process.env.ACCESS_TOKEN_SECRET as string,
       );
 
-      response.cookie("token", token, {
-        httpOnly: true,
-        sameSite: "none",
-        secure: true,
-      });
+      // response.cookie("token", token, {
+      //   httpOnly: true,
+      //   sameSite: "none",
+      //   secure: true,
+      // });
       client.release();
       return response.json({ token, success: true });
     } else {
