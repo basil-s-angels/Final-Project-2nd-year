@@ -3,14 +3,13 @@ import jwt, { JsonWebTokenError } from "jsonwebtoken";
 
 const router = express.Router();
 
-router.get("/", (request: Request, response: Response) => {
+router.post("/", (request: Request, response: Response) => {
   try {
-    const authHeader = request.header("Authorization");
-    const token = authHeader?.split(" ")[1];
+    const { token } = request.body;
 
     if (token) {
       jwt.verify(
-        token,
+        token["value"],
         process.env.ACCESS_TOKEN_SECRET as string,
         (err: JsonWebTokenError | null, decoded: any) => {
           if (err) {

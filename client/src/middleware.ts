@@ -9,12 +9,14 @@ export async function middleware(request: NextRequest) {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/user-middleware`,
       {
-        method: "GET",
+        method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${cookie}`,
         },
+        body: JSON.stringify({
+          token: cookie,
+        }),
       },
     );
 
