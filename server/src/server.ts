@@ -36,14 +36,14 @@ async function serverStart() {
 
   app
     .set("trust proxy", 1)
-    .use(cookieParser())
     .use(
       cors({
+        origin: "https://final-project-2nd-year.vercel.app/",
         credentials: true,
-        origin: process.env.CLIENT_URL,
         optionsSuccessStatus: 200,
       }),
     )
+    .use(cookieParser())
     .use(bodyParser.json())
     .use(bodyParser.urlencoded({ extended: true }))
     .use("/signup", signup)
