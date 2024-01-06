@@ -35,6 +35,7 @@ async function serverStart() {
   });
 
   app
+    .set("trust proxy", 1)
     .use(cookieParser())
     .use(
       cors({
