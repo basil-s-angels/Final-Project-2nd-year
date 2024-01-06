@@ -28,7 +28,8 @@ export const pool = new Pool({
 
 async function serverStart() {
   const app = express();
-  const port = 8080;
+  const host = process.env.SERVER_HOST;
+  const port = process.env.SERVER_PORT;
 
   app.get("/", async (req, res) => {
     res.send(`Hello world!`);
@@ -62,7 +63,7 @@ async function serverStart() {
     .use("/top-sellers", topSellers);
 
   app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
+    console.log(`Listening on http://${host}:${port}`);
   });
 }
 
