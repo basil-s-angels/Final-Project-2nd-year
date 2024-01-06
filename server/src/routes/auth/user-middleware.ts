@@ -16,7 +16,6 @@ router.post("/", (request: Request, response: Response) => {
             response.clearCookie("token");
             return response.sendStatus(401);
           } else {
-            // console.log(decoded, "from backend!");
             return response.json({ decoded });
           }
         },
