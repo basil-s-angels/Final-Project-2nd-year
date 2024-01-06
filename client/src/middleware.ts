@@ -57,5 +57,6 @@ export async function middleware(request: NextRequest) {
     }
   } catch (error) {
     console.error(error);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_CLIENT_URL}/`);
   }
 }
