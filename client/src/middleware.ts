@@ -1,10 +1,11 @@
+/* eslint-disable no-unused-vars */
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // console.log(request, "from middleware")
   try {
     const pathname = request.nextUrl.pathname;
-    const cookie = request.cookies.get("token");
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/user-middleware`,
@@ -15,13 +16,14 @@ export async function middleware(request: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          token: cookie,
+          token: request.cookies.get("token"),
         }),
       },
     );
 
     if (response.ok) {
       const user = await response.json();
+      console.log(user.decoded, "gotten from middleware");
       if (user.decoded.position === "admin") {
         if (pathname === "/admin/login" || pathname === "/admin/signup") {
           return NextResponse.redirect(
