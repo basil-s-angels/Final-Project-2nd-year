@@ -9,5 +9,6 @@ export default async function setCookie(token: string) {
     httpOnly: true,
     secure: true,
     path: "/",
+    sameSite: "none",
   });
 }
