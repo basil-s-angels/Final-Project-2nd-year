@@ -30,8 +30,8 @@ export default function Form() {
         const result = await response.json();
         if (result.success) {
           console.log("success! from login form", result);
-          router.push("/admin");
           setCookie(result.token);
+          setTimeout(() => router.push("/admin"), 2000);
         }
       } else {
         console.error("HTTP error:", response.statusText);
