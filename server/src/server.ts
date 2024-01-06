@@ -38,7 +38,7 @@ async function serverStart() {
     .set("trust proxy", 1)
     .use(
       cors({
-        origin: "https://final-project-2nd-year.vercel.app/",
+        origin: "https://final-project-2nd-year.vercel.app",
         credentials: true,
         optionsSuccessStatus: 200,
       }),
