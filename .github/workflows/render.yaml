@@ -1,4 +1,4 @@
-name: Render Deployment
+name: My Deploy
 on:
   push:
     paths:
