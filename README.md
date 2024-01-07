@@ -62,7 +62,7 @@ npm run dev
 
 This should run the dev script on both frontend and backend simultaneously. If you prefer running both frontend and backend separately, [see links below](#run-the-frontend).
 
-After accessing localhost:3000, you will be greeted by the name of the group members. To get started on the customer side, go to [localhost:3000/insert-table-number-here/menu-page](localhost:3000/1/menu-page). For the admin side, go to [localhost:3000/admin](localhost:3000/admin), go check credentials section to log in.
+After accessing localhost:3000, you will be greeted by the name of the group members. To get started on the customer side, go to [localhost:3000/insert-table-number-here/menu-page](http://localhost:3000/1/menu-page). For the admin side, go to [localhost:3000/admin](http://localhost:3000/admin), go check credentials section to log in.
 
 ## Credentials
 
